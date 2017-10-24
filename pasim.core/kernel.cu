@@ -47,11 +47,11 @@ __host__ cudaError_t cuda_sync_dev(particle_system const * const ps, float const
 	return cudaSuccess;
 }
 
-__host__ cudaError_t cuda_launch(particle_system * const ps, v3 * const dp, float const dt)
+__host__ cudaError_t cuda_launch(particle_system * const ps, float const dt)
 {
 	cudaError_t status;
 
-	//cuda_tick <<<1, 3>>>(ps->N, ps->m, ps->r, ps->p, dp, dt);
+	cuda_tick<<<1, 3>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
 
 	if ((status = cudaGetLastError()))
 		return status;
@@ -62,15 +62,10 @@ __host__ cudaError_t cuda_launch(particle_system * const ps, v3 * const dp, floa
 	return cudaSuccess;
 }
 
-/*__host__ cudaError_t cuda_sync_host(particle_system * const ps, particle_system const * const d_ps)
+__host__ cudaError_t cuda_sync_host(particle_system * const ps)
 {
-	cudaError_t status;
-
-	if ((status = cudaMemcpy(ps->p, d_ps->p, sizeof(v3) * ps->N, cudaMemcpyDeviceToHost)))
-		return status;
-
-	return cudaSuccess;
-}*/
+	return cudaMemcpy(ps->r, ps->dev_r, sizeof(v3) * ps->N, cudaMemcpyDeviceToHost);
+}
 
 __host__ cudaError_t cuda_deinit(particle_system * const ps)
 {

@@ -10,6 +10,7 @@ namespace pasim.net
     public class ParticleSystem
     {
         internal IntPtr? Handle = null;
+        internal IntPtr PositionsHandle;
 
         public ParticleSystem(uint particles, float massMin, float massMax, float positionMax, float momentumMax)
         {

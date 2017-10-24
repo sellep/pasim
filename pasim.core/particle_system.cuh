@@ -7,14 +7,13 @@
 typedef struct
 {
 	uint N;
+	//host mem
+	v3 *r;
+	//device mem
 	float *dev_m;
 	v3 *dev_r;
 	v3 *dev_p;
 	v3 *dev_dp;
 } particle_system;
-
-//ps save
-
-//ps load
 
 #endif

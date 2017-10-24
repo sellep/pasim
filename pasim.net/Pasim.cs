@@ -18,10 +18,13 @@ namespace pasim.net
         private static extern int pasim_deinit(IntPtr handle);
 
         [DllImport("pasim.core.dll")]
-        private static extern void pasim_tick(IntPtr handle, float dt);
+        private static extern int pasim_tick(IntPtr handle, float dt);
 
         [DllImport("pasim.core.dll")]
         private static extern void pasim_error_string(StringBuilder buffer, int capacity, int status);
+
+		[DllImort("pasim.core.dll")]
+		private static extern int pasim_update_host(IntPtr handle);
 
         public static CudaStatus Init(ParticleSystem system)
         {
@@ -29,14 +32,13 @@ namespace pasim.net
             Assert.Null(system.Handle);
 
             IntPtr masses = MallocAndCopy(system.Masses);
-            IntPtr positions = MallocAndCopy(system.Positions);
             IntPtr momentums = MallocAndCopy(system.Momentums);
+            system.PositionsHandle = MallocAndCopy(system.Positions);
 
             IntPtr handle = IntPtr.Zero;
-            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, masses, positions, momentums);
+            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, masses, system.PositionsHandle, momentums);
 
             Marshal.FreeHGlobal(masses);
-            Marshal.FreeHGlobal(positions);
             Marshal.FreeHGlobal(momentums);
 
             if (status == CudaStatus.cudaSuccess)
@@ -69,8 +71,28 @@ namespace pasim.net
 
             int status = pasim_deinit(system.Handle.Value);
 
+            Marshal.FreeHGlobal(system.);
             system.Handle = default(IntPtr);
         }
+
+		public static CudaStatus Update(ParticleSystem system)
+		{
+			Assert.NotNull(system);
+			Assert.NotNull(system.Handle);
+
+			CudaStatus status = (CudaStatus) pasim_update_host(system.Handle.Value);
+
+			if (status == CudaStatus.cudaSuccess)
+			{
+				IntPtr j = system.PositionsHandle;
+				for (int i = 0; i < system.Particles; i++, handle += size)
+				{
+					Marshal.PtrToStructure(system.Positions[i], handle, false);
+				}
+			}
+
+			return status;
+		}
 
         private static IntPtr MallocAndCopy(float[] arr)
         {
