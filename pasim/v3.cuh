@@ -1,7 +1,7 @@
 #ifndef __PASIM_V3_H
 #define __PASIM_V3_H 1
 
-#include "device_launch_parameters.h"
+#include "defs.cuh"
 #include "math.h"
 
 typedef struct
@@ -10,6 +10,20 @@ typedef struct
 	float y;
 	float z;
 } v3;
+
+__host__ __device__ inline void v3_zero(v3 * const a)
+{
+	a->x = 0;
+	a->y = 0;
+	a->z = 0;
+}
+
+__host__ __device__ inline void v3_set(v3 * const a, float const x, float const y, float const z)
+{
+	a->x = x;
+	a->y = y;
+	a->z = z;
+}
 
 __host__ __device__ inline void v3_add(v3 * const c, v3 const * const a, v3 const * const b)
 {
