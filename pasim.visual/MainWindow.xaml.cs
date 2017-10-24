@@ -23,6 +23,10 @@ namespace pasim.visual
     {
         public MainWindow()
         {
+            //https://stackoverflow.com/questions/14968529/drawing-an-opengl-scene-to-c-sharp-bitmap-off-screen-gets-clipped
+            //
+
+
             InitializeComponent();
 
             ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
