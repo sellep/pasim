@@ -1,4 +1,6 @@
 x64/
+obj/
+bin/
 .vs/
 *.user
 

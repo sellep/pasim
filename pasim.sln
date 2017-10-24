@@ -3,18 +3,42 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pasim", "pasim\pasim.vcxproj", "{04B29FFA-C0EA-4030-9A09-62EEB4435616}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pasim.core", "pasim.core\pasim.core.vcxproj", "{04B29FFA-C0EA-4030-9A09-62EEB4435616}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pasim.visual", "pasim.visual\pasim.visual.csproj", "{68EAE506-8398-4BC6-BC0D-D068329DF10B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pasim.net", "pasim.net\pasim.net.csproj", "{9F682A5F-38F9-42E1-9AA8-3B1853B61601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Debug|x64.ActiveCfg = Debug|x64
 		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Debug|x64.Build.0 = Debug|x64
+		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Release|Any CPU.ActiveCfg = Release|x64
 		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Release|x64.ActiveCfg = Release|x64
 		{04B29FFA-C0EA-4030-9A09-62EEB4435616}.Release|x64.Build.0 = Release|x64
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Debug|x64.Build.0 = Debug|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Release|x64.ActiveCfg = Release|Any CPU
+		{68EAE506-8398-4BC6-BC0D-D068329DF10B}.Release|x64.Build.0 = Release|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F682A5F-38F9-42E1-9AA8-3B1853B61601}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
