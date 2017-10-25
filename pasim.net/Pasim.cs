@@ -117,6 +117,8 @@ namespace pasim.net
 
         public static void QueryDimensions(uint requiredThreads, out Dim3 block, out Dim3 grid, int? maxThreadsPerBlock = null)
         {
+            //block size must be multiple of 32
+
             block = new Dim3(0, 0, 1);
             grid = new Dim3(0, 0, 1);
 
