@@ -113,9 +113,23 @@ namespace pasim.net
             return props;
         }
 
-        public static void ChooseDimensions()
+        public static void QueryDimensions(uint requiredThreads, out Dim3 block, out Dim3 grid, int maxThreadsPerBlock = 1024)
         {
+            block = new Dim3(0, 0, 0);
+            grid = new Dim3(0, 0, 0);
+
             CudaDeviceProp props = GetDeviceProperties();
+
+            block.x = (uint)Math.Sqrt(props.maxThreadsPerBlock > maxThreadsPerBlock ? maxThreadsPerBlock : props.maxThreadsPerBlock);
+            block.y = block.x;
+
+            grid.x = (uint)Math.Sqrt((double) requiredThreads / (block.x * block.y));
+            grid.y = grid.x;
+
+            while (block.x * block.y * grid.x * grid.y < requiredThreads)
+            {
+                grid.y++;
+            }
         }
 
         private static IntPtr MallocAndCopy(float[] arr)

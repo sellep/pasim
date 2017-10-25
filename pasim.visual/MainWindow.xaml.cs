@@ -33,17 +33,17 @@ namespace pasim.visual
         {
             InitializeComponent();
 
-            CudaDeviceProp props = Pasim.GetDeviceProperties();
+            Pasim.QueryDimensions(100000, out Dim3 block, out Dim3 grid);
 
-            //ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
+            ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
 
-            //AssertStatus(() => Pasim.Init(sys));
+            AssertStatus(() => Pasim.Init(sys, block, grid));
 
-            //AssertStatus(() => Pasim.Tick(sys, 12));
+            AssertStatus(() => Pasim.Tick(sys, 12));
 
-            //AssertStatus(() => Pasim.Update(sys));
+            AssertStatus(() => Pasim.Update(sys));
 
-            //Pasim.Deinit(sys);
+            Pasim.Deinit(sys);
         }
     }
 }
