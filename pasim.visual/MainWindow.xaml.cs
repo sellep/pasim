@@ -26,7 +26,7 @@ namespace pasim.visual
         {
             CudaStatus status = a();
             if (status != CudaStatus.cudaSuccess)
-                throw new Exception(status.ToString());
+                throw new Exception($"{status.ToString()}: {Pasim.GetErrorString(status)}");
         }
 
         public MainWindow()
@@ -35,7 +35,7 @@ namespace pasim.visual
 
             Pasim.QueryDimensions(100000, out Dim3 block, out Dim3 grid);
 
-            ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
+            ParticleSystem sys = new ParticleSystem(100000, 1, 1, 100, 0.5f);
 
             AssertStatus(() => Pasim.Init(sys, block, grid));
 

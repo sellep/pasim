@@ -12,7 +12,7 @@ namespace pasim.net
     {
 
         [DllImport("pasim.core.dll")]
-        private static extern int pasim_init(ref IntPtr handle, uint particles, IntPtr masses, IntPtr positions, IntPtr momentums, IntPtr blockdim, IntPtr gridDim);
+        private static extern int pasim_init(ref IntPtr handle, uint particles, IntPtr dimensions, IntPtr masses, IntPtr positions, IntPtr momentums);
 
         [DllImport("pasim.core.dll")]
         private static extern int pasim_deinit(IntPtr handle);
@@ -34,13 +34,15 @@ namespace pasim.net
             Assert.NotNull(system);
             Assert.Null(system.Handle);
 
+            IntPtr dimensions = MallocAndCopy(new[] { block, grid });
             IntPtr masses = MallocAndCopy(system.Masses);
             IntPtr momentums = MallocAndCopy(system.Momentums);
             system.PositionsHandle = MallocAndCopy(system.Positions);
 
             IntPtr handle = IntPtr.Zero;
-            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, masses, system.PositionsHandle, momentums, IntPtr.Zero, IntPtr.Zero);
+            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, dimensions, masses, system.PositionsHandle, momentums);
 
+            Marshal.FreeHGlobal(dimensions);
             Marshal.FreeHGlobal(masses);
             Marshal.FreeHGlobal(momentums);
 
@@ -115,8 +117,8 @@ namespace pasim.net
 
         public static void QueryDimensions(uint requiredThreads, out Dim3 block, out Dim3 grid, int? maxThreadsPerBlock = null)
         {
-            block = new Dim3(0, 0, 0);
-            grid = new Dim3(0, 0, 0);
+            block = new Dim3(0, 0, 1);
+            grid = new Dim3(0, 0, 1);
 
             uint diff = uint.MaxValue;
             Dim3 tmp = new Dim3(0, 0, 0);
@@ -136,7 +138,8 @@ namespace pasim.net
                 if ((block.x * block.y * tmp.x * tmp.y) - requiredThreads < diff)
                 {
                     diff = (block.x * block.y * tmp.x * tmp.y) - requiredThreads;
-                    grid = tmp;
+                    grid.x = tmp.x;
+                    grid.y = tmp.y;
                 }
             }
         }
@@ -149,9 +152,9 @@ namespace pasim.net
             return handle;
         }
 
-        private static IntPtr MallocAndCopy(Vector3[] arr)
+        private static IntPtr MallocAndCopy<T>(T[] arr)
         {
-            IntPtr handle = Malloc<Vector3>(out int size, arr.Length);
+            IntPtr handle = Malloc<T>(out int size, arr.Length);
 
             IntPtr j = handle;
             for (int i = 0; i < arr.Length; i++, j += size)

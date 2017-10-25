@@ -12,10 +12,10 @@ extern "C"
 	__declspec(dllexport) int pasim_init(
 		void * * const handle,
 		uint const particles,
+		dim3 * const dims,
 		float * const masses,
 		v3 * const positions,
-		v3 * const momentums,
-		dim3 * const dims)
+		v3 * const momentums)
 	{
 		cudaError_t status;
 		particle_system *ps;
@@ -25,6 +25,9 @@ extern "C"
 		ps->r = positions;
 		ps->block = dims[0];
 		ps->grid = dims[1];
+
+		printf("block dim: (%i, %i, %i)\n", ps->block.x, ps->block.y, ps->block.z);
+		printf("grid dim: (%i, %i, %i)\n", ps->grid.x, ps->grid.y, ps->grid.z);
 
 		if ((status = cuda_init(ps)))
 			return status;
@@ -67,11 +70,6 @@ extern "C"
 		cudaError_t status;
 
 		status = cudaGetDeviceProperties(props, 0);
-
-		printf("maxThreadsPerBlock: %i\n", props->maxThreadsPerBlock);
-		printf("maxThreadsDim: (%i, %i, %i)\n", props->maxThreadsDim[0], props->maxThreadsDim[1], props->maxThreadsDim[2]);
-		printf("maxGridSize: (%i, %i, %i)\n", props->maxGridSize[0], props->maxGridSize[1], props->maxGridSize[2]);
-		printf("maxThreadsPerMultiProcessor: %i\n", props->maxThreadsPerMultiProcessor);
 
 		return status;
 	}

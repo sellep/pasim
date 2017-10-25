@@ -5,9 +5,23 @@
 extern __device__ void delta_momentum(v3 * const, particle_system * const, float const, uint const);
 extern __device__ void apply_momentum(particle_system * const);
 
+__device__ static inline uint cuda_index()
+{
+	uint threadsPerRow = blockDim.x * gridDim.x;
+	return (blockIdx.y * threadsPerRow * blockDim.y)
+		+ (threadIdx.y * threadsPerRow)
+		+ (blockIdx.x * blockDim.x)
+		+ threadIdx.x;
+}
+
 __global__ void cuda_tick(uint const N, float * const m, v3 * const r, v3 * const p, v3 * const dp, float const dt)
 {
-	v3_set(r + threadIdx.x, threadIdx.x, threadIdx.x, threadIdx.x);
+	uint idx = cuda_index();
+	if (idx < N)
+	{
+		v3_set(r + idx, idx, idx, idx);
+	}
+	
 
 	//__syncthreads();
 }
@@ -51,7 +65,7 @@ __host__ cudaError_t cuda_launch(particle_system * const ps, float const dt)
 {
 	cudaError_t status;
 
-	cuda_tick<<<ps->block, ps->grid>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
+	cuda_tick<<<ps->grid, ps->block>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
 
 	if ((status = cudaGetLastError()))
 		return status;
