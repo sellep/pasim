@@ -23,8 +23,11 @@ namespace pasim.net
         [DllImport("pasim.core.dll")]
         private static extern void pasim_error_string(StringBuilder buffer, int capacity, int status);
 
-		[DllImort("pasim.core.dll")]
-		private static extern int pasim_update_host(IntPtr handle);
+        [DllImport("pasim.core.dll")]
+        private static extern int pasim_sync_host(IntPtr handle);
+
+        [DllImport("pasim.core.dll")]
+        private static extern int pasim_dev_props(IntPtr handle);
 
         public static CudaStatus Init(ParticleSystem system)
         {
@@ -56,12 +59,12 @@ namespace pasim.net
             return sb.ToString();
         }
 
-        public static void Tick(ParticleSystem system, float dt)
+        public static CudaStatus Tick(ParticleSystem system, float dt)
         {
             Assert.NotNull(system);
             Assert.NotNull(system.Handle);
 
-            pasim_tick(system.Handle.Value, dt);
+            return (CudaStatus) pasim_tick(system.Handle.Value, dt);
         }
 
         public static void Deinit(ParticleSystem system)
@@ -71,49 +74,69 @@ namespace pasim.net
 
             int status = pasim_deinit(system.Handle.Value);
 
-            Marshal.FreeHGlobal(system.);
+            Marshal.FreeHGlobal(system.PositionsHandle);
             system.Handle = default(IntPtr);
         }
 
-		public static CudaStatus Update(ParticleSystem system)
-		{
-			Assert.NotNull(system);
-			Assert.NotNull(system.Handle);
+        public static CudaStatus Update(ParticleSystem system)
+        {
+            Assert.NotNull(system);
+            Assert.NotNull(system.Handle);
 
-			CudaStatus status = (CudaStatus) pasim_update_host(system.Handle.Value);
+            CudaStatus status = (CudaStatus)pasim_sync_host(system.Handle.Value);
 
-			if (status == CudaStatus.cudaSuccess)
-			{
-				IntPtr j = system.PositionsHandle;
-				for (int i = 0; i < system.Particles; i++, handle += size)
-				{
-					Marshal.PtrToStructure(system.Positions[i], handle, false);
-				}
-			}
+            IntPtr handle = system.PositionsHandle;
+            if (status == CudaStatus.cudaSuccess)
+            {
+                int size = Marshal.SizeOf<Vector3>();
+                IntPtr j = system.PositionsHandle;
+                for (int i = 0; i < system.Particles; i++, handle += size)
+                {
+                    system.Positions[i] = Marshal.PtrToStructure<Vector3>(handle);
+                }
+            }
 
-			return status;
-		}
+            return status;
+        }
+
+        public static CudaDeviceProp GetDeviceProperties()
+        {
+            IntPtr handle = Malloc<CudaDeviceProp>(out int size);
+
+            CudaStatus status = (CudaStatus)pasim_dev_props(handle);
+
+            CudaDeviceProp props = Marshal.PtrToStructure<CudaDeviceProp>(handle);
+
+            Marshal.FreeHGlobal(handle);
+
+            return props;
+        }
 
         private static IntPtr MallocAndCopy(float[] arr)
         {
-            int size = Marshal.SizeOf<float>() * arr.Length;
-            IntPtr handle = Marshal.AllocHGlobal(size);
+            IntPtr handle = Malloc<float>(out int size, arr.Length);
+
             Marshal.Copy(arr, 0, handle, arr.Length);
             return handle;
         }
 
         private static IntPtr MallocAndCopy(Vector3[] arr)
         {
-            int size = Marshal.SizeOf<Vector3>();
-            IntPtr handle = Marshal.AllocHGlobal(size * arr.Length);
+            IntPtr handle = Malloc<Vector3>(out int size, arr.Length);
 
             IntPtr j = handle;
-            for (int i = 0; i < arr.Length; i++, handle += size)
+            for (int i = 0; i < arr.Length; i++, j += size)
             {
-                Marshal.StructureToPtr(arr[i], handle, false);
+                Marshal.StructureToPtr(arr[i], j, false);
             }
 
             return handle;
+        }
+
+        private static IntPtr Malloc<T>(out int size, int length = 1)
+        {
+            size = Marshal.SizeOf<T>();
+            return Marshal.AllocHGlobal(size * length);
         }
     }
 }

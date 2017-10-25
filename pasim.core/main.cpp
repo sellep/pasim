@@ -51,11 +51,23 @@ extern "C"
 
 	__declspec(dllexport) int pasim_tick(particle_system * const ps, float const dt)
 	{
-		return cuda_launch(ps, dt)
+		return cuda_launch(ps, dt);
 	}
 
-	__declspec(dllexport) int pasim_sync(particle_system * const ps)
+	__declspec(dllexport) int pasim_sync_host(particle_system * const ps)
 	{
 		return cuda_sync_host(ps);
+	}
+
+	__declspec(dllexport) int pasim_dev_props(cudaDeviceProp * const props)
+	{
+		cudaError_t status;
+		
+		status = cudaGetDeviceProperties(props, 0);
+
+		printf("size of size_t: %i\n", sizeof(size_t));
+		printf("size of cudadeviceProps: %i\n", sizeof(cudaDeviceProp));
+
+		return status;
 	}
 }

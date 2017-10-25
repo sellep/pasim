@@ -21,19 +21,27 @@ namespace pasim.visual
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        private static void AssertStatus(Func<CudaStatus> a)
+        {
+            CudaStatus status = a();
+            if (status != CudaStatus.cudaSuccess)
+                throw new Exception(status.ToString());
+        }
+
         public MainWindow()
         {
-            //https://stackoverflow.com/questions/14968529/drawing-an-opengl-scene-to-c-sharp-bitmap-off-screen-gets-clipped
-            //
-
-
             InitializeComponent();
+
+            CudaDeviceProp props = Pasim.GetDeviceProperties();
 
             ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
 
-            Pasim.Init(sys);
+            AssertStatus(() => Pasim.Init(sys));
 
-            Pasim.Tick(sys, 12);
+            AssertStatus(() => Pasim.Tick(sys, 12));
+
+            AssertStatus(() => Pasim.Update(sys));
 
             Pasim.Deinit(sys);
         }

@@ -7,7 +7,7 @@ extern __device__ void apply_momentum(particle_system * const);
 
 __global__ void cuda_tick(uint const N, float * const m, v3 * const r, v3 * const p, v3 * const dp, float const dt)
 {
-	v3_set(p + threadIdx.x, threadIdx.x, threadIdx.x, threadIdx.x);
+	v3_set(r + threadIdx.x, threadIdx.x, threadIdx.x, threadIdx.x);
 
 	//__syncthreads();
 }

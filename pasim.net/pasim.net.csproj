@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
+    <Compile Include="CudaDeviceProps.cs" />
     <Compile Include="CudaStatus.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Pasim.cs" />
