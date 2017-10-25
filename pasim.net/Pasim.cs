@@ -118,17 +118,26 @@ namespace pasim.net
             block = new Dim3(0, 0, 0);
             grid = new Dim3(0, 0, 0);
 
+            uint diff = uint.MaxValue;
+            Dim3 tmp = new Dim3(0, 0, 0);
+
             CudaDeviceProp props = GetDeviceProperties();
 
             block.x = (uint)Math.Sqrt(props.maxThreadsPerBlock > maxThreadsPerBlock ? maxThreadsPerBlock : props.maxThreadsPerBlock);
             block.y = block.x;
 
-            grid.x = (uint)Math.Sqrt((double) requiredThreads / (block.x * block.y));
-            grid.y = grid.x;
-
-            while (block.x * block.y * grid.x * grid.y < requiredThreads)
+            for (tmp.x = (uint)Math.Ceiling(Math.Sqrt((double)requiredThreads / (block.x * block.y))); tmp.x > 0; tmp.x--)
             {
-                grid.y++;
+                while (block.x * block.y * tmp.x * tmp.y < requiredThreads)
+                {
+                    tmp.y++;
+                }
+
+                if ((block.x * block.y * tmp.x * tmp.y) - requiredThreads < diff)
+                {
+                    diff = (block.x * block.y * tmp.x * tmp.y) - requiredThreads;
+                    grid = tmp;
+                }
             }
         }
 
