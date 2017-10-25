@@ -44,6 +44,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="CudaDeviceProps.cs" />
     <Compile Include="CudaStatus.cs" />
+    <Compile Include="Dim3.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Pasim.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

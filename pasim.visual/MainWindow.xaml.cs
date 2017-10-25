@@ -35,15 +35,15 @@ namespace pasim.visual
 
             CudaDeviceProp props = Pasim.GetDeviceProperties();
 
-            ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
+            //ParticleSystem sys = new ParticleSystem(1000, 1, 1, 100, 0.5f);
 
-            AssertStatus(() => Pasim.Init(sys));
+            //AssertStatus(() => Pasim.Init(sys));
 
-            AssertStatus(() => Pasim.Tick(sys, 12));
+            //AssertStatus(() => Pasim.Tick(sys, 12));
 
-            AssertStatus(() => Pasim.Update(sys));
+            //AssertStatus(() => Pasim.Update(sys));
 
-            Pasim.Deinit(sys);
+            //Pasim.Deinit(sys);
         }
     }
 }

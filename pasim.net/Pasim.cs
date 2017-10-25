@@ -12,7 +12,7 @@ namespace pasim.net
     {
 
         [DllImport("pasim.core.dll")]
-        private static extern int pasim_init(ref IntPtr handle, uint particles, IntPtr masses, IntPtr positions, IntPtr momentums);
+        private static extern int pasim_init(ref IntPtr handle, uint particles, IntPtr masses, IntPtr positions, IntPtr momentums, IntPtr blockdim, IntPtr gridDim);
 
         [DllImport("pasim.core.dll")]
         private static extern int pasim_deinit(IntPtr handle);
@@ -29,7 +29,7 @@ namespace pasim.net
         [DllImport("pasim.core.dll")]
         private static extern int pasim_dev_props(IntPtr handle);
 
-        public static CudaStatus Init(ParticleSystem system)
+        public static CudaStatus Init(ParticleSystem system, Dim3 block, Dim3 grid)
         {
             Assert.NotNull(system);
             Assert.Null(system.Handle);
@@ -39,7 +39,7 @@ namespace pasim.net
             system.PositionsHandle = MallocAndCopy(system.Positions);
 
             IntPtr handle = IntPtr.Zero;
-            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, masses, system.PositionsHandle, momentums);
+            CudaStatus status = (CudaStatus) pasim_init(ref handle, system.Particles, masses, system.PositionsHandle, momentums, IntPtr.Zero, IntPtr.Zero);
 
             Marshal.FreeHGlobal(masses);
             Marshal.FreeHGlobal(momentums);
@@ -104,12 +104,18 @@ namespace pasim.net
             IntPtr handle = Malloc<CudaDeviceProp>(out int size);
 
             CudaStatus status = (CudaStatus)pasim_dev_props(handle);
-
             CudaDeviceProp props = Marshal.PtrToStructure<CudaDeviceProp>(handle);
-
             Marshal.FreeHGlobal(handle);
 
+            if (status != CudaStatus.cudaSuccess)
+                throw new Exception(status.ToString());
+
             return props;
+        }
+
+        public static void ChooseDimensions()
+        {
+            CudaDeviceProp props = GetDeviceProperties();
         }
 
         private static IntPtr MallocAndCopy(float[] arr)

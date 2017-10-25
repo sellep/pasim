@@ -51,7 +51,7 @@ __host__ cudaError_t cuda_launch(particle_system * const ps, float const dt)
 {
 	cudaError_t status;
 
-	cuda_tick<<<1, 3>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
+	cuda_tick<<<ps->block, ps->grid>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
 
 	if ((status = cudaGetLastError()))
 		return status;

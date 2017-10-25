@@ -14,7 +14,8 @@ extern "C"
 		uint const particles,
 		float * const masses,
 		v3 * const positions,
-		v3 * const momentums)
+		v3 * const momentums,
+		dim3 * const dims)
 	{
 		cudaError_t status;
 		particle_system *ps;
@@ -22,6 +23,8 @@ extern "C"
 		ps = (particle_system*)malloc(sizeof(particle_system));
 		ps->N = particles;
 		ps->r = positions;
+		ps->block = dims[0];
+		ps->grid = dims[1];
 
 		if ((status = cuda_init(ps)))
 			return status;
@@ -62,11 +65,13 @@ extern "C"
 	__declspec(dllexport) int pasim_dev_props(cudaDeviceProp * const props)
 	{
 		cudaError_t status;
-		
+
 		status = cudaGetDeviceProperties(props, 0);
 
-		printf("size of size_t: %i\n", sizeof(size_t));
-		printf("size of cudadeviceProps: %i\n", sizeof(cudaDeviceProp));
+		printf("maxThreadsPerBlock: %i\n", props->maxThreadsPerBlock);
+		printf("maxThreadsDim: (%i, %i, %i)\n", props->maxThreadsDim[0], props->maxThreadsDim[1], props->maxThreadsDim[2]);
+		printf("maxGridSize: (%i, %i, %i)\n", props->maxGridSize[0], props->maxGridSize[1], props->maxGridSize[2]);
+		printf("maxThreadsPerMultiProcessor: %i\n", props->maxThreadsPerMultiProcessor);
 
 		return status;
 	}

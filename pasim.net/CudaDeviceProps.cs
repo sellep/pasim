@@ -16,7 +16,7 @@ namespace pasim.net
         public ulong sharedMemPerBlock;          /**< Shared memory available per block in bytes */
         public int regsPerBlock;               /**< 32-bit registers available per block */
         public int warpSize;                   /**< Warp size in threads */
-        public uint memPitch;                   /**< Maximum pitch in bytes allowed by memory copies */
+        public ulong memPitch;                   /**< Maximum pitch in bytes allowed by memory copies */
         public int maxThreadsPerBlock;         /**< Maximum number of threads per block */
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
         public int[] maxThreadsDim;           /**< Maximum size of each dimension of a block */

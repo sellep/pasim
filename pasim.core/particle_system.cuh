@@ -14,6 +14,9 @@ typedef struct
 	v3 *dev_r;
 	v3 *dev_p;
 	v3 *dev_dp;
+	//settings
+	dim3 block;
+	dim3 grid;
 } particle_system;
 
 #endif
