@@ -1,6 +1,4 @@
-#include "defs.cuh"
-#include "v3.cuh"
-#include "particle_system.cuh"
+#include "kernel.cuh"
 
 __device__ void delta_momentum(v3 * const dp, int const N, float * const m, v3 * const r, float const dt, uint const i)
 {
@@ -32,7 +30,16 @@ __device__ void delta_momentum(v3 * const dp, int const N, float * const m, v3 *
 	v3_imul(&dp[i], &F, dt);
 }
 
-__device__ void apply_momentum(particle_system * const ps)
+__global__ void kernel_delta_momentum(uint const N, float * const m, v3 * const r, v3 * const p, v3 * const dp, float const dt)
 {
+	uint idx = cuda_index();
+	if (idx < N)
+	{
+		delta_momentum(dp, N, m, r, dt, idx);
+	}
+}
 
+__host__ void launch_delta_momentum(particle_system * const ps, float const dt)
+{
+	kernel_delta_momentum<<<ps->grid, ps->block>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
 }

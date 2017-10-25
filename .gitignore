@@ -1,6 +1,7 @@
 x64/
 obj/
 bin/
+packages/
 .vs/
 *.user
 

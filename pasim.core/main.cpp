@@ -26,9 +26,6 @@ extern "C"
 		ps->block = dims[0];
 		ps->grid = dims[1];
 
-		printf("block dim: (%i, %i, %i)\n", ps->block.x, ps->block.y, ps->block.z);
-		printf("grid dim: (%i, %i, %i)\n", ps->grid.x, ps->grid.y, ps->grid.z);
-
 		if ((status = cuda_init(ps)))
 			return status;
 

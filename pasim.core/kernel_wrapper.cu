@@ -2,29 +2,8 @@
 #include "v3.cuh"
 #include "particle_system.cuh"
 
-extern __device__ void delta_momentum(v3 * const, particle_system * const, float const, uint const);
-extern __device__ void apply_momentum(particle_system * const);
-
-__device__ static inline uint cuda_index()
-{
-	uint threadsPerRow = blockDim.x * gridDim.x;
-	return (blockIdx.y * threadsPerRow * blockDim.y)
-		+ (threadIdx.y * threadsPerRow)
-		+ (blockIdx.x * blockDim.x)
-		+ threadIdx.x;
-}
-
-__global__ void cuda_tick(uint const N, float * const m, v3 * const r, v3 * const p, v3 * const dp, float const dt)
-{
-	uint idx = cuda_index();
-	if (idx < N)
-	{
-		v3_set(r + idx, idx, idx, idx);
-	}
-	
-
-	//__syncthreads();
-}
+void launch_delta_momentum(particle_system * const, float const);
+void launch_apply_momentum(particle_system * const, float const);
 
 __host__ cudaError_t cuda_init(particle_system * const ps)
 {
@@ -65,7 +44,15 @@ __host__ cudaError_t cuda_launch(particle_system * const ps, float const dt)
 {
 	cudaError_t status;
 
-	cuda_tick<<<ps->grid, ps->block>>>(ps->N, ps->dev_m, ps->dev_r, ps->dev_p, ps->dev_dp, dt);
+	launch_delta_momentum(ps, dt);
+
+	if ((status = cudaGetLastError()))
+		return status;
+
+	if ((status = cudaDeviceSynchronize()))
+		return status;
+
+	launch_apply_momentum(ps, dt);
 
 	if ((status = cudaGetLastError()))
 		return status;
