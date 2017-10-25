@@ -12,7 +12,7 @@ namespace pasim.net
         internal IntPtr? Handle = null;
         internal IntPtr PositionsHandle;
 
-        public ParticleSystem(uint particles, float massMin, float massMax, float positionMax, float momentumMax)
+        public ParticleSystem(uint particles, float massMin, float massMax, float positionMax, float momentumMax, Dim3 block = default(Dim3), Dim3 grid = default(Dim3))
         {
             Particles = particles;
 
@@ -28,6 +28,14 @@ namespace pasim.net
                 Positions[i] = new Vector3((float)rand.NextDouble() * positionMax, (float)rand.NextDouble() * positionMax, (float)rand.NextDouble() * positionMax);
                 Momentums[i] = new Vector3((float)rand.NextDouble() * momentumMax, (float)rand.NextDouble() * momentumMax, (float)rand.NextDouble() * momentumMax);
             }
+
+            if (block == default(Dim3) || grid == default(Dim3))
+            {
+                Pasim.QueryDimensions(particles, out block, out grid);
+            }
+
+            BlockDim = block;
+            GridDim = grid;
         }
 
         public uint Particles { get; }
@@ -37,5 +45,9 @@ namespace pasim.net
         public Vector3[] Positions { get; }
 
         public Vector3[] Momentums { get; }
+
+        public Dim3 BlockDim { get; }
+
+        public Dim3 GridDim { get; }
     }
 }

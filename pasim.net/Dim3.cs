@@ -21,5 +21,15 @@ namespace pasim.net
             this.y = y;
             this.z = z;
         }
-    }
+
+        public static bool operator ==(Dim3 d1, Dim3 d2)
+        {
+            return d1.x == d2.x && d1.y == d2.y && d1.z == d2.z;
+        }
+
+        public static bool operator !=(Dim3 d1, Dim3 d2)
+        {
+            return !(d1 == d2);
+        }
+}
 }

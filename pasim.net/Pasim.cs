@@ -29,12 +29,12 @@ namespace pasim.net
         [DllImport("pasim.core.dll")]
         private static extern int pasim_dev_props(IntPtr handle);
 
-        public static CudaStatus Init(ParticleSystem system, Dim3 block, Dim3 grid)
+        public static CudaStatus Init(ParticleSystem system)
         {
             Assert.NotNull(system);
             Assert.Null(system.Handle);
 
-            IntPtr dimensions = MallocAndCopy(new[] { block, grid });
+            IntPtr dimensions = MallocAndCopy(new[] { system.BlockDim, system.GridDim });
             IntPtr masses = MallocAndCopy(system.Masses);
             IntPtr momentums = MallocAndCopy(system.Momentums);
             system.PositionsHandle = MallocAndCopy(system.Positions);
