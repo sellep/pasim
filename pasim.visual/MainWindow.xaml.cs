@@ -34,6 +34,8 @@ namespace pasim.visual
         private volatile bool _UpdateAvailable = false;
         private volatile bool _Terminate = false;
         private volatile uint _PhysicFrames = 0;
+        private volatile float _AverageTickTime = 0;
+        private volatile float _AverageUpdateTime = 0;
 
         private static void AssertStatus(Func<CudaStatus> a)
         {
@@ -66,7 +68,7 @@ namespace pasim.visual
 
             IEnumerable<Vector3> positions = _System.Positions.Select(r => r).ToArray();
 
-            _Info.Text = $"Physic frames: {_PhysicFrames}";
+            _Info.Text = $"Physic frames: {_PhysicFrames}{Environment.NewLine}Average tick time: {_AverageTickTime}{Environment.NewLine}Average update time: {_AverageUpdateTime}";
 
             OpenGL gl = args.OpenGL;
 
@@ -90,13 +92,27 @@ namespace pasim.visual
 
         private void PhysicsThread()
         {
+            float tickTime, updateTime;
+            DateTime start;
+
             AssertStatus(() => Pasim.Init(_System));
 
             while (!_Terminate)
             {
+                start = DateTime.Now;
                 AssertStatus(() => Pasim.Tick(_System, 0.1f));
+                tickTime = (float)(DateTime.Now - start).TotalMilliseconds;
+
+                start = DateTime.Now;
                 AssertStatus(() => Pasim.Update(_System));
+                updateTime = (float)(DateTime.Now - start).TotalMilliseconds;
+
+                _AverageTickTime = (_AverageTickTime * _PhysicFrames + tickTime);
+                _AverageUpdateTime = (_AverageUpdateTime * _PhysicFrames + updateTime);
                 _PhysicFrames++;
+                _AverageTickTime /= _PhysicFrames;
+                _AverageUpdateTime /= _PhysicFrames;
+
                 _UpdateAvailable = true;
             }
 

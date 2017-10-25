@@ -9,6 +9,7 @@
     <Grid>
         <ContentControl x:Name="_RenderTarget" />
         <TextBlock x:Name="_Info"
+                   TextWrapping="Wrap"
                    Foreground="White"/>
     </Grid>
 </Window>
