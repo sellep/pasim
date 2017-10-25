@@ -113,7 +113,7 @@ namespace pasim.net
             return props;
         }
 
-        public static void QueryDimensions(uint requiredThreads, out Dim3 block, out Dim3 grid, int maxThreadsPerBlock = 1024)
+        public static void QueryDimensions(uint requiredThreads, out Dim3 block, out Dim3 grid, int? maxThreadsPerBlock = null)
         {
             block = new Dim3(0, 0, 0);
             grid = new Dim3(0, 0, 0);
@@ -123,7 +123,7 @@ namespace pasim.net
 
             CudaDeviceProp props = GetDeviceProperties();
 
-            block.x = (uint)Math.Sqrt(props.maxThreadsPerBlock > maxThreadsPerBlock ? maxThreadsPerBlock : props.maxThreadsPerBlock);
+            block.x = (uint)Math.Sqrt(maxThreadsPerBlock.GetValueOrDefault(props.maxThreadsPerBlock));
             block.y = block.x;
 
             for (tmp.x = (uint)Math.Ceiling(Math.Sqrt((double)requiredThreads / (block.x * block.y))); tmp.x > 0; tmp.x--)
