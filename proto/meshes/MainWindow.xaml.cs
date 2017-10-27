@@ -34,6 +34,8 @@ namespace meshes
             _System = new ParticleSystem(100);
             _System.Tick(12);
 
+            _Selection = Rand.Next(_System.Count);
+
             OpenGLControl control = new OpenGLControl();
 
             control.OpenGLInitialized += Control_OpenGLInitialized;
@@ -50,10 +52,8 @@ namespace meshes
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
             gl.LoadIdentity();
 
-            DrawCenterOfMass(gl);
             DrawParticles(gl);
 
-            
             gl.Flush();
         }
 
@@ -75,21 +75,21 @@ namespace meshes
 
         private void DrawParticles(OpenGL gl)
         {
-            //gl.Begin(BeginMode.Points);
-            //gl.Color(1f, 0f, 0f);
+            gl.Begin(BeginMode.Points);
+            gl.Color(1f, 0f, 0f);
 
-            //for (uint i = 0; i < N; i++)
-            //{
-            //    if (i != _Selection)
-            //    {
-            //        gl.Vertex(_Positions[i].x, _Positions[i].y, 0);
-            //    }
-            //}
+            for (uint i = 0; i < _System.Count; i++)
+            {
+                if (i != _Selection)
+                {
+                    gl.Vertex(_System.Positions[i].x, _System.Positions[i].y, 0);
+                }
+            }
 
-            //gl.Color(1f, 1f, 1f);
-            //gl.Vertex(_Positions[_Selection].x, _Positions[_Selection].y, 0);
+            gl.Color(1f, 1f, 1f);
+            gl.Vertex(_System.Positions[_Selection].x, _System.Positions[_Selection].y, 0);
 
-            //gl.End();
+            gl.End();
         }
 
         private void DrawMeshes(OpenGL gl)
@@ -151,19 +151,19 @@ namespace meshes
 
         private void DrawL1Mesh(OpenGL gl, Mesh mesh)
         {
-            //float x = mesh.x * MESH_L1_NODE_LENGTH - POSITION_MAX;
-            //float y = mesh.y * MESH_L1_NODE_LENGTH - POSITION_MAX;
+            float x = mesh.x * ParticleSystem.MESH_NODE_LENGTH - _System.CenterOfMass.x;
+            float y = mesh.y * ParticleSystem.MESH_NODE_LENGTH - _System.CenterOfMass.y;
 
-            //gl.Begin(BeginMode.LineLoop);
+            gl.Begin(BeginMode.LineLoop);
 
-            //gl.Color(0f, 1f, 0f);
+            gl.Color(0f, 1f, 0f);
 
-            //gl.Vertex(x, y, 0f);
-            //gl.Vertex(x + MESH_L1_NODE_LENGTH, y, 0f);
-            //gl.Vertex(x + MESH_L1_NODE_LENGTH, y + MESH_L1_NODE_LENGTH, 0f);
-            //gl.Vertex(x, y + MESH_L1_NODE_LENGTH, 0f);
+            gl.Vertex(x, y, 0f);
+            gl.Vertex(x + ParticleSystem.MESH_NODE_LENGTH, y, 0f);
+            gl.Vertex(x + ParticleSystem.MESH_NODE_LENGTH, y + ParticleSystem.MESH_NODE_LENGTH, 0f);
+            gl.Vertex(x, y + ParticleSystem.MESH_NODE_LENGTH, 0f);
 
-            //gl.End();
+            gl.End();
         }
 
         private void Control_Resized(object sender, OpenGLEventArgs args)

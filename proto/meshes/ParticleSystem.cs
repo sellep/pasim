@@ -22,14 +22,14 @@ namespace meshes
 
         public Vector3 CenterOfMass;
 
-        public uint[] Mapping;
+        public int[] Mapping;
 
         public ParticleSystem(uint count)
         {
             Count = count;
             Positions = new Vector3[count];
             Masses = new float[count];
-            Mapping = new uint[count];
+            Mapping = new int[count];
 
             for (uint i = 0; i < count; i++)
             {
@@ -53,7 +53,7 @@ namespace meshes
 
             MapPositionsToMesh();
 
-            //compute meshed base center of mass
+            ComputeMeshCentersOfMass();
 
             //physix
         }
@@ -72,28 +72,66 @@ namespace meshes
 
         private void MapPositionsToMesh()
         {
+            Vector3 pos, norm;
+            int j;
+
             for (uint i = 0; i < Count; i++)
             {
-                float x = MESH_WIDTH / 2 + Positions[i].x - CenterOfMass.x;
-                float y = MESH_WIDTH / 2 + Positions[i].y - CenterOfMass.y;
+                pos = Positions[i];
+                norm.x = pos.x - CenterOfMass.x;
+                norm.y = pos.y - CenterOfMass.y;
+
+                float x = norm.x + MESH_WIDTH / 2;
+                if (x < 0 || x >= MESH_WIDTH)
+                {
+                    Mapping[i] = -1;
+                    continue;
+                }
+
+                float y = norm.y + MESH_WIDTH / 2;
+                if (y < 0 || y >= MESH_WIDTH)
+                {
+                    Mapping[i] = -1;
+                    continue;
+                }
 
                 uint x_idx = (uint)(x / MESH_NODE_LENGTH);
                 uint y_idx = (uint)(y / MESH_NODE_LENGTH);
 
-                Mapping[i] = y_idx * MESH_LENGTH + x_idx;
+                j = (int) (y_idx * MESH_LENGTH + x_idx);
+
+                if (j >= Meshes.Length)
+                    throw new Exception("index out of range");
+
+                Mapping[i] = j;
             }
         }
 
         private void ComputeMeshCentersOfMass()
         {
-            //reset mass and vector from meshes
+            uint i;
+            int mi;
+            Mesh m;
 
-            for (uint i = 0; i < Count; i++)
+            for (i = 0; i < MESH_LENGTH * MESH_LENGTH; i++)
             {
-                //mesh.centerOfMass += Location[i] * Mass[i]
+                Meshes[i].Reset();
             }
 
-            //Meshes.CenterOfMass /= Mesh.Mass;
+            for (i = 0; i < Count; i++)
+            {
+                mi = Mapping[i];
+                if (mi == -1)
+                    continue;
+
+                m = Meshes[mi];
+                m.AddParticle(ref Positions[i], Masses[i]);
+            }
+
+            for (i = 0; i < MESH_LENGTH * MESH_LENGTH; i++)
+            {
+                Meshes[i].center /= Meshes[i].mass;
+            }
         }
     }
 }

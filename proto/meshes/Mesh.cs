@@ -28,6 +28,18 @@ namespace meshes
             this.parent = parent;
         }
 
+        public void Reset()
+        {
+            Vector3.Zero(ref center);
+            mass = 0;
+        }
+
+        public void AddParticle(ref Vector3 position, float mass)
+        {
+            center += position * mass;
+            this.mass += mass;
+        }
+
         //public static void CreateMeshes(Mesh[] l1, Mesh[] l2, Mesh[] l3)
         //{
         //    Mesh mesh;
