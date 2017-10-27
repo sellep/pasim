@@ -1,5 +1,11 @@
 #include "kernel.cuh"
 
+__device__ void compute_meshed_delta_momentum(
+	uint      const idx)
+{
+
+}
+
 __device__ void delta_momentum(v3 * const dp, int const N, float * const m, v3 * const r, float const dt, uint const i)
 {
 	v3 F, self_r, tmp;

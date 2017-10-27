@@ -15,6 +15,9 @@
 #define P_BOUNDARY 0.5f
 #define GRAVITATION_CONSTANT 0.05f
 
+#define MESH_GRID_SIDE_NODES 2000
+#define MESH_NODE_SIDE_LENGTH 0.5f
+
 typedef unsigned int uint;
 
 static inline __host__ __device__ float frand(float const min, float const max)

@@ -3,6 +3,7 @@
 
 #include "defs.cuh"
 #include "v3.cuh"
+#include "mesh.cuh"
 #include "particle_system.cuh"
 
 __device__ static inline uint cuda_index()
