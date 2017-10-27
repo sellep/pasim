@@ -9,16 +9,20 @@ namespace meshes
     public class ParticleSystem
     {
         public const float POSITION_MAX = 100;
-        public const uint MESH_LENGTH = 3 * 3 * 9;
-        public const float MESH_NODE_LENGTH = (2 * POSITION_MAX) / MESH_LENGTH;
-        public const float MESH_WIDTH = MESH_LENGTH * MESH_NODE_LENGTH;
+        public const uint MESH_L2_LENGTH = 9;
+        public const uint MESH_L1_LENGTH = 3;
+        public const uint MESH_LENGTH = MESH_L2_LENGTH * MESH_L1_LENGTH;
+        public const float MESH_NODE_L1_LENGTH = (2 * POSITION_MAX) / MESH_LENGTH;
+        public const float MESH_WIDTH = MESH_LENGTH * MESH_NODE_L1_LENGTH;
 
         public uint Count;
 
         public Vector3[] Positions;
 
         public float[] Masses;
-        public Mesh[] Meshes;
+
+        public Mesh[,] MeshesL1;
+        public Mesh[,] MeshesL2;
 
         public Vector3 CenterOfMass;
 
@@ -37,12 +41,25 @@ namespace meshes
                 Masses[i] = Rand.NextSingle() / 2 + 0.5f;
             }
 
-            Meshes = new Mesh[MESH_LENGTH * MESH_LENGTH];
-            for (uint y = 0; y < MESH_LENGTH; y++)
+            MeshesL1 = new Mesh[MESH_LENGTH, MESH_LENGTH];
+            MeshesL2 = new Mesh[MESH_L2_LENGTH, MESH_L2_LENGTH];
+
+            for (uint y2 = 0; y2 < MESH_L2_LENGTH; y2++)
             {
-                for (uint x = 0; x < MESH_LENGTH; x++)
+                for (uint x2 = 0; x2 < MESH_L2_LENGTH; x2++)
                 {
-                    Meshes[y * MESH_LENGTH + x] = new Mesh(x, y);
+                    Mesh l2 = new Mesh(x2, y2);
+
+                    MeshesL2[y2, x2] = l2;
+
+                    //generate L1 meshes
+                    for (uint y1 = 0; y1 < MESH_L1_LENGTH; y1++)
+                    {
+                        for (uint x1 = 0; x1 < MESH_L1_LENGTH; x1++)
+                        {
+                            MeshesL1[x2 * MESH_L1_LENGTH + x1, y2 * MESH_L1_LENGTH + y1] = new Mesh(l2, x2 * MESH_L1_LENGTH + x1, y2 * MESH_L1_LENGTH + y1, x1, y1);
+                        }
+                    }
                 }
             }
         }
@@ -73,7 +90,6 @@ namespace meshes
         private void MapPositionsToMesh()
         {
             Vector3 pos, norm;
-            int j;
 
             for (uint i = 0; i < Count; i++)
             {
@@ -95,27 +111,24 @@ namespace meshes
                     continue;
                 }
 
-                uint x_idx = (uint)(x / MESH_NODE_LENGTH);
-                uint y_idx = (uint)(y / MESH_NODE_LENGTH);
+                uint x_idx = (uint)(x / MESH_NODE_L1_LENGTH);
+                uint y_idx = (uint)(y / MESH_NODE_L1_LENGTH);
 
-                j = (int) (y_idx * MESH_LENGTH + x_idx);
-
-                if (j >= Meshes.Length)
-                    throw new Exception("index out of range");
-
-                Mapping[i] = j;
+                Mapping[i] = (int)(y_idx * MESH_LENGTH + x_idx);
             }
         }
 
         private void ComputeMeshCentersOfMass()
         {
-            uint i;
+            uint i, x2, y2, x1, y1, x, y;
             int mi;
-            Mesh m;
 
-            for (i = 0; i < MESH_LENGTH * MESH_LENGTH; i++)
+            for (y1 = 0; y1 < MESH_LENGTH ; y1++)
             {
-                Meshes[i].Reset();
+                for (x1 = 0; x1 < MESH_LENGTH; x1++)
+                {
+                    MeshesL1[x1, y1].Reset();
+                }
             }
 
             for (i = 0; i < Count; i++)
@@ -124,13 +137,34 @@ namespace meshes
                 if (mi == -1)
                     continue;
 
-                m = Meshes[mi];
-                m.AddParticle(ref Positions[i], Masses[i]);
+                y = (uint)mi / MESH_LENGTH;
+                x = (uint)mi - (y * MESH_LENGTH);
+
+                MeshesL1[x, y].AddParticle(ref Positions[i], Masses[i]);
             }
 
-            for (i = 0; i < MESH_LENGTH * MESH_LENGTH; i++)
+            for (y2 = 0; y2 < MESH_L2_LENGTH; y2++)
             {
-                Meshes[i].center /= Meshes[i].mass;
+                for (x2 = 0; x2 < MESH_L2_LENGTH; x2++)
+                {
+                    MeshesL2[x2, y2].Reset();
+
+                    for (y1 = 0; y1 < MESH_L1_LENGTH; y1++)
+                    {
+                        for (x1 = 0; x1 < MESH_L1_LENGTH; x1++)
+                        {
+                            x = x2 * MESH_L1_LENGTH + x1;
+                            y = y2 * MESH_L1_LENGTH + y1;
+
+                            MeshesL2[x2, y2].center += MeshesL1[x, y].center;
+                            MeshesL2[x2, y2].mass   += MeshesL1[x, y].mass;
+
+                            MeshesL1[x, y].center /= MeshesL1[x, y].mass;
+                        }
+                    }
+
+                    MeshesL2[x2, y2].center /= MeshesL2[x2, y2].mass;
+                }
             }
         }
     }

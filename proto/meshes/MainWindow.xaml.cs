@@ -41,8 +41,30 @@ namespace meshes
             control.OpenGLInitialized += Control_OpenGLInitialized;
             control.OpenGLDraw += Control_OpenGLDraw;
             control.Resized += Control_Resized;
+            control.MouseLeftButtonDown += Control_MouseLeftButtonDown; ;
 
             _RenderTarget.Content = control;
+        }
+
+        private void Control_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            /*glGetDoublev(GL_MODELVIEW_MATRIX, modelview); //get the modelview info
+            glGetDoublev(GL_PROJECTION_MATRIX, projection); //get the projection matrix info
+            glGetIntegerv(GL_VIEWPORT, viewport); //get the viewport info*/
+
+            OpenGL gl = (sender as OpenGLControl).OpenGL;
+
+            double winx, winy;
+            int[] viewport = new int[4];
+
+            gl.GetInteger(OpenGL.GL_VIEWPORT, viewport);
+
+            winx = e.GetPosition(sender as OpenGLControl).X;
+            winy = viewport[3] - e.GetPosition(sender as OpenGLControl).Y;
+
+            double[] worldc = gl.UnProject(winx, winy, 0);
+
+
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
@@ -52,31 +74,21 @@ namespace meshes
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
             gl.LoadIdentity();
 
+            gl.Translate(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
+
+            DrawL1Mesh(gl);
+            DrawCenterOfMass(gl);
             DrawParticles(gl);
 
             gl.Flush();
         }
 
-        private void DrawCenterOfMass(OpenGL gl)
-        {
-            //Vector3 com = ParticleSystem.CenterOfMass(_Positions, _Masses);
-
-            //gl.Begin(BeginMode.Lines);
-            //gl.Color(0f, 0f, 1f);
-
-            //gl.Vertex(-POSITION_MAX, com.y, 0);
-            //gl.Vertex(+POSITION_MAX, com.y, 0);
-
-            //gl.Vertex(com.x, -POSITION_MAX, 0);
-            //gl.Vertex(com.x, +POSITION_MAX, 0);
-
-            //gl.End();
-        }
-
         private void DrawParticles(OpenGL gl)
         {
-            gl.Begin(BeginMode.Points);
             gl.Color(1f, 0f, 0f);
+            gl.PointSize(1.5f);
+
+            gl.Begin(BeginMode.Points);
 
             for (uint i = 0; i < _System.Count; i++)
             {
@@ -92,97 +104,79 @@ namespace meshes
             gl.End();
         }
 
-        private void DrawMeshes(OpenGL gl)
+        private void DrawCenterOfMass(OpenGL gl)
         {
-            //uint idx_l3 = _Mapping[_Selection];
+            gl.Color(1f, 1f, 0f, 0.7f);
+            gl.PointSize(3f);
 
-            //Mesh l3 = _MeshesL3[idx_l3];
+            gl.Begin(BeginMode.Points);
 
-            //foreach (Mesh mesh in _MeshesL3.Where(m => m.parent == l3.parent))
-            //{
-            //    DrawL3Mesh(gl, mesh);
-            //}
-
-            //Mesh l2 = l3.parent;
-            //foreach (Mesh mesh in _MeshesL2.Where(m => m.parent == l2.parent))
-            //{
-            //    DrawL2Mesh(gl, mesh);
-            //}
-
-            //foreach (Mesh mesh in _MeshesL1.Where(m => m != l2.parent))
-            //{
-            //    DrawL1Mesh(gl, mesh);
-            //}
-        }
-
-        private void DrawL3Mesh(OpenGL gl, Mesh mesh)
-        {
-            //float x = mesh.x * MESH_L3_NODE_LENGTH - POSITION_MAX;
-            //float y = mesh.y * MESH_L3_NODE_LENGTH - POSITION_MAX;
-
-            //gl.Begin(BeginMode.LineLoop);
-
-            //gl.Color(0f, 1f, 0f);
-
-            //gl.Vertex(x, y, 0f);
-            //gl.Vertex(x + MESH_L3_NODE_LENGTH, y, 0f);
-            //gl.Vertex(x + MESH_L3_NODE_LENGTH, y + MESH_L3_NODE_LENGTH, 0f);
-            //gl.Vertex(x, y + MESH_L3_NODE_LENGTH, 0f);
-
-            //gl.End();
-        }
-
-        private void DrawL2Mesh(OpenGL gl, Mesh mesh)
-        {
-            //float x = mesh.x * MESH_L2_NODE_LENGTH - POSITION_MAX;
-            //float y = mesh.y * MESH_L2_NODE_LENGTH - POSITION_MAX;
-
-            //gl.Begin(BeginMode.LineLoop);
-
-            //gl.Color(0f, 1f, 0f);
-
-            //gl.Vertex(x, y, 0f);
-            //gl.Vertex(x + MESH_L2_NODE_LENGTH, y, 0f);
-            //gl.Vertex(x + MESH_L2_NODE_LENGTH, y + MESH_L2_NODE_LENGTH, 0f);
-            //gl.Vertex(x, y + MESH_L2_NODE_LENGTH, 0f);
-
-            //gl.End();
-        }
-
-        private void DrawL1Mesh(OpenGL gl, Mesh mesh)
-        {
-            float x = mesh.x * ParticleSystem.MESH_NODE_LENGTH - _System.CenterOfMass.x;
-            float y = mesh.y * ParticleSystem.MESH_NODE_LENGTH - _System.CenterOfMass.y;
-
-            gl.Begin(BeginMode.LineLoop);
-
-            gl.Color(0f, 1f, 0f);
-
-            gl.Vertex(x, y, 0f);
-            gl.Vertex(x + ParticleSystem.MESH_NODE_LENGTH, y, 0f);
-            gl.Vertex(x + ParticleSystem.MESH_NODE_LENGTH, y + ParticleSystem.MESH_NODE_LENGTH, 0f);
-            gl.Vertex(x, y + ParticleSystem.MESH_NODE_LENGTH, 0f);
+            gl.Vertex(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
 
             gl.End();
         }
 
+        private void DrawL1Mesh(OpenGL gl)
+        {
+            float x, y;
+            uint x1, y1;
+
+            gl.Color(0f, 1f, 0f, 0.5f);
+            gl.LineWidth(1f);
+
+            for (y1 = 0; y1 < ParticleSystem.MESH_LENGTH; y1++)
+            {
+                for (x1 = 0; x1 < ParticleSystem.MESH_LENGTH; x1++)
+                {
+                    x = _System.MeshesL1[x1, y1].x * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.x;
+                    y = _System.MeshesL1[x1, y1].y * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.y;
+
+                    gl.Begin(BeginMode.LineStrip);
+
+                    if (x1 == 0)
+                    {
+                        gl.Vertex(x, y, 0f);
+                    }
+
+                    gl.Vertex(x, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
+                    gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
+                    gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y, 0f);
+
+                    if (y1 == 0)
+                    {
+                        gl.Vertex(x, y, 0f);
+                    }
+
+                    gl.End();
+                }
+            }
+        }
+
         private void Control_Resized(object sender, OpenGLEventArgs args)
         {
-            //OpenGL gl = args.OpenGL;
+            OpenGL gl = args.OpenGL;
 
-            //gl.Viewport(0, 0, (int)gl.RenderContextProvider.Width, (int)gl.RenderContextProvider.Height);
-            //gl.MatrixMode(OpenGL.GL_PROJECTION);
-            //gl.LoadIdentity();
+            gl.Viewport(0, 0, (int)gl.RenderContextProvider.Width, (int)gl.RenderContextProvider.Height);
+            gl.MatrixMode(OpenGL.GL_PROJECTION);
+            gl.LoadIdentity();
 
-            ////gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, LENGTH);
-            //gl.Ortho(-POSITION_MAX * 2, POSITION_MAX * 2, -POSITION_MAX * 2, POSITION_MAX * 2, 1, -1);
+            //gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, LENGTH);
+            gl.Ortho(-ParticleSystem.MESH_WIDTH, ParticleSystem.MESH_WIDTH, -ParticleSystem.MESH_WIDTH, ParticleSystem.MESH_WIDTH, 1, -1);
 
-            //gl.MatrixMode(OpenGL.GL_MODELVIEW);
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
         }
 
         private void Control_OpenGLInitialized(object sender, OpenGLEventArgs args)
         {
-            args.OpenGL.Enable(OpenGL.GL_DEPTH_TEST);
+            OpenGL gl = args.OpenGL;
+            gl.Enable(OpenGL.GL_DEPTH_TEST);
+            gl.Enable(OpenGL.GL_LINE_SMOOTH);
+            gl.Enable(OpenGL.GL_POINT_SMOOTH);
+            gl.Enable(OpenGL.GL_BLEND);
+            gl.Hint(OpenGL.GL_LINE_SMOOTH_HINT, OpenGL.GL_NICEST);
+            gl.Hint(OpenGL.GL_POINT_SMOOTH_HINT, OpenGL.GL_NICEST);
+
+            gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
         }
     }
 }

@@ -11,6 +11,8 @@ namespace meshes
     {
         public uint x;
         public uint y;
+        public uint x_rel;
+        public uint y_rel;
         public float mass;
         public Vector3 center;
         public Mesh parent;
@@ -21,11 +23,13 @@ namespace meshes
             this.y = y;
         }
 
-        public Mesh(uint x, uint y, Mesh parent)
+        public Mesh(Mesh parent, uint x, uint y, uint x_rel, uint y_rel)
         {
+            this.parent = parent;
             this.x = x;
             this.y = y;
-            this.parent = parent;
+            this.x_rel = x_rel;
+            this.y_rel = y_rel;
         }
 
         public void Reset()
@@ -39,49 +43,5 @@ namespace meshes
             center += position * mass;
             this.mass += mass;
         }
-
-        //public static void CreateMeshes(Mesh[] l1, Mesh[] l2, Mesh[] l3)
-        //{
-        //    Mesh mesh;
-
-        //    for (uint y = 0; y < MainWindow.MESH_L1_LENGTH; y++)
-        //    {
-        //        for (uint x = 0; x < MainWindow.MESH_L1_LENGTH; x++)
-        //        {
-        //            mesh = new Mesh(x, y);
-        //            l1[mesh.y * MainWindow.MESH_L1_LENGTH + mesh.x] = mesh;
-        //            CreateL2Meshes(mesh, l2, l3);
-        //        }
-        //    }
-        //}
-
-        //private static void CreateL2Meshes(Mesh parent, Mesh[] l2, Mesh[] l3)
-        //{
-        //    Mesh mesh;
-
-        //    for (uint y = 0; y < MainWindow.MESH_L2_LENGTH; y++)
-        //    {
-        //        for (uint x = 0; x < MainWindow.MESH_L2_LENGTH; x++)
-        //        {
-        //            mesh = new Mesh(parent.x * MainWindow.MESH_L2_LENGTH + x, parent.y * MainWindow.MESH_L2_LENGTH + y, parent);
-        //            l2[mesh.y * MainWindow.MESH_L2_LENGTH * MainWindow.MESH_L1_LENGTH + mesh.x] = mesh;
-        //            CreateL3Meshes(mesh, l3);
-        //        }
-        //    }
-        //}
-
-        //private static void CreateL3Meshes(Mesh parent, Mesh[] l3)
-        //{
-        //    Mesh mesh;
-
-        //    for (uint y = 0; y < MainWindow.MESH_L3_LENGTH; y++)
-        //    {
-        //        for (uint x = 0; x < MainWindow.MESH_L3_LENGTH; x++)
-        //        {
-        //            mesh = new Mesh(parent.x * MainWindow.MESH_L3_LENGTH + x, parent.y * MainWindow.MESH_L3_LENGTH + y, parent);
-        //            l3[mesh.y * MainWindow.MESH_L3_LENGTH * MainWindow.MESH_L2_LENGTH * MainWindow.MESH_L1_LENGTH + mesh.x] = mesh;
-        //        }
-        //    }
-        //}
     }
 }
