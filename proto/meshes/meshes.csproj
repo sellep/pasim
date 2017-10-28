@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="SharpGL.WPF, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpGL.WPF.2.4.0.0\lib\net40\SharpGL.WPF.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -63,6 +64,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Mesh1.cs" />
+    <Compile Include="Mesh2.cs" />
+    <Compile Include="Mesh3.cs" />
     <Compile Include="Rand.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Vector3.cs" />

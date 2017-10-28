@@ -24,17 +24,17 @@ namespace meshes
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static float SELECTION_RANGE_MAX = 5f;
+
         private ParticleSystem _System = null;
-        private uint _Selection;
+        private uint? _Selection = null;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _System = new ParticleSystem(100);
+            _System = new ParticleSystem(10000);
             _System.Tick(12);
-
-            _Selection = Rand.Next(_System.Count);
 
             OpenGLControl control = new OpenGLControl();
 
@@ -48,10 +48,6 @@ namespace meshes
 
         private void Control_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            /*glGetDoublev(GL_MODELVIEW_MATRIX, modelview); //get the modelview info
-            glGetDoublev(GL_PROJECTION_MATRIX, projection); //get the projection matrix info
-            glGetIntegerv(GL_VIEWPORT, viewport); //get the viewport info*/
-
             OpenGL gl = (sender as OpenGLControl).OpenGL;
 
             double winx, winy;
@@ -64,7 +60,25 @@ namespace meshes
 
             double[] worldc = gl.UnProject(winx, winy, 0);
 
+            Vector3 mouse = new Vector3((float) worldc[0], (float)worldc[1], 0);
 
+            float min = Vector3.Distance(mouse, _System.Positions[0]), current;
+            _Selection = 0;
+
+            for (uint i = 1; i < _System.Count; i++)
+            {
+                current = Vector3.Distance(mouse, _System.Positions[i]);
+                if (current < min)
+                {
+                    min = current;
+                    _Selection = i;
+                }
+            }
+
+            if (min >= SELECTION_RANGE_MAX)
+            {
+                _Selection = null;
+            }
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
@@ -76,8 +90,7 @@ namespace meshes
 
             gl.Translate(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
 
-            DrawL1Mesh(gl);
-            DrawCenterOfMass(gl);
+            //DrawL1Mesh(gl);
             DrawParticles(gl);
 
             gl.Flush();
@@ -85,21 +98,33 @@ namespace meshes
 
         private void DrawParticles(OpenGL gl)
         {
-            gl.Color(1f, 0f, 0f);
-            gl.PointSize(1.5f);
+            gl.PointSize(3f);
 
             gl.Begin(BeginMode.Points);
-
+            gl.Color(0f, 0.65f, 1f);
+            
             for (uint i = 0; i < _System.Count; i++)
             {
-                if (i != _Selection)
-                {
-                    gl.Vertex(_System.Positions[i].x, _System.Positions[i].y, 0);
-                }
+                if (_Selection.HasValue && i == _Selection.Value)
+                    continue;
+
+                gl.Vertex(_System.Positions[i].x, _System.Positions[i].y, 0);
             }
 
-            gl.Color(1f, 1f, 1f);
-            gl.Vertex(_System.Positions[_Selection].x, _System.Positions[_Selection].y, 0);
+            if (_Selection.HasValue)
+            {
+                gl.Color(1f, 1f, 1f);
+                gl.Vertex(_System.Positions[_Selection.Value].x, _System.Positions[_Selection.Value].y, 0);
+            }
+
+            /*// Create a Vector Buffer Object that will store the vertices on video memory
+2 	GLuint vbo;
+3 	glGenBuffers(1, &vbo);
+4 
+5 	// Allocate space and upload the data from CPU to GPU
+6 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+7 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_position), vertices_position, GL_STATIC_DRAW);
+*/
 
             gl.End();
         }
@@ -107,7 +132,7 @@ namespace meshes
         private void DrawCenterOfMass(OpenGL gl)
         {
             gl.Color(1f, 1f, 0f, 0.7f);
-            gl.PointSize(3f);
+            gl.PointSize(2f);
 
             gl.Begin(BeginMode.Points);
 
@@ -116,41 +141,41 @@ namespace meshes
             gl.End();
         }
 
-        private void DrawL1Mesh(OpenGL gl)
-        {
-            float x, y;
-            uint x1, y1;
+        //private void DrawL1Mesh(OpenGL gl)
+        //{
+        //    float x, y;
+        //    uint x1, y1;
 
-            gl.Color(0f, 1f, 0f, 0.5f);
-            gl.LineWidth(1f);
+        //    gl.Color(0f, 1f, 0f, 0.5f);
+        //    gl.LineWidth(10f);
 
-            for (y1 = 0; y1 < ParticleSystem.MESH_LENGTH; y1++)
-            {
-                for (x1 = 0; x1 < ParticleSystem.MESH_LENGTH; x1++)
-                {
-                    x = _System.MeshesL1[x1, y1].x * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.x;
-                    y = _System.MeshesL1[x1, y1].y * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.y;
+        //    for (y1 = 0; y1 < ParticleSystem.MESH_LENGTH; y1++)
+        //    {
+        //        for (x1 = 0; x1 < ParticleSystem.MESH_LENGTH; x1++)
+        //        {
+        //            x = _System.MeshesL1[x1, y1].x * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.x;
+        //            y = _System.MeshesL1[x1, y1].y * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.y;
 
-                    gl.Begin(BeginMode.LineStrip);
+        //            gl.Begin(BeginMode.LineStrip);
 
-                    if (x1 == 0)
-                    {
-                        gl.Vertex(x, y, 0f);
-                    }
+        //            if (x1 == 0)
+        //            {
+        //                gl.Vertex(x, y, 0f);
+        //            }
 
-                    gl.Vertex(x, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
-                    gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
-                    gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y, 0f);
+        //            gl.Vertex(x, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
+        //            gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
+        //            gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y, 0f);
 
-                    if (y1 == 0)
-                    {
-                        gl.Vertex(x, y, 0f);
-                    }
+        //            if (y1 == 0)
+        //            {
+        //                gl.Vertex(x, y, 0f);
+        //            }
 
-                    gl.End();
-                }
-            }
-        }
+        //            gl.End();
+        //        }
+        //    }
+        //}
 
         private void Control_Resized(object sender, OpenGLEventArgs args)
         {
@@ -169,9 +194,10 @@ namespace meshes
         private void Control_OpenGLInitialized(object sender, OpenGLEventArgs args)
         {
             OpenGL gl = args.OpenGL;
-            gl.Enable(OpenGL.GL_DEPTH_TEST);
+            //gl.Enable(OpenGL.GL_DEPTH_TEST);
             gl.Enable(OpenGL.GL_LINE_SMOOTH);
             gl.Enable(OpenGL.GL_POINT_SMOOTH);
+            gl.Enable(OpenGL.GL_PROGRAM_POINT_SIZE);
             gl.Enable(OpenGL.GL_BLEND);
             gl.Hint(OpenGL.GL_LINE_SMOOTH_HINT, OpenGL.GL_NICEST);
             gl.Hint(OpenGL.GL_POINT_SMOOTH_HINT, OpenGL.GL_NICEST);

@@ -19,6 +19,7 @@ namespace meshes
             x = Rand.NextSingle() * positionMax * 2 - positionMax;
             y = Rand.NextSingle() * positionMax * 2 - positionMax;
             z = Rand.NextSingle() * positionMax * 2 - positionMax;
+            z = 0;
         }
 
         public Vector3(float x, float y, float z)
@@ -30,13 +31,21 @@ namespace meshes
 
         public static Vector3 operator +(Vector3 a, Vector3 b) => new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 
+        public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+
         public static Vector3 operator *(Vector3 a, float b) => new Vector3(a.x * b, a.y * b, a.z * b);
 
         public static Vector3 operator /(Vector3 a, float b) => new Vector3(a.x / b, a.y / b, a.z / b);
 
         public override string ToString() => $"({x}, {y}, {z})";
 
-        public static void Zero(ref Vector3 v)
+        public static float Distance(Vector3 a, Vector3 b)
+        {
+            Vector3 diff = a - b;
+            return (float)Math.Sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+        }
+
+        public static void zero(ref Vector3 v)
         {
             v.x = v.y = v.z = 0;
         }

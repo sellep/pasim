@@ -7,31 +7,35 @@ using System.Threading.Tasks;
 namespace meshes
 {
 
-    public struct Mesh
+    public struct Mesh1
     {
-        public const uint MESH_1_LENGTH = 7;
-        public const uint MESH_2_LENGTH = 3;
-        public const uint MESH_3_LENGTH = 3;
+        public uint x;
+        public uint y;
 
         public Vector3 centerOfMass;
         public float mass;
 
-        public Mesh1[,] meshes1;
+        public Mesh parent;
+        public Mesh2[,] meshes2;
 
-        public Mesh(uint length)
+        public Mesh1(Mesh parent, uint x, uint y)
         {
             uint sub_x, sub_y;
+
+            this.parent = parent;
+            this.x = x;
+            this.y = y;
 
             centerOfMass = new Vector3();
             mass = 0;
 
-            meshes1 = new Mesh1[MESH_1_LENGTH, MESH_1_LENGTH];
+            meshes2 = new Mesh2[Mesh.MESH_2_LENGTH, Mesh.MESH_2_LENGTH];
 
-            for (sub_y = 0; sub_y < MESH_1_LENGTH; sub_y++)
+            for (sub_y = 0; sub_y < Mesh.MESH_2_LENGTH; sub_y++)
             {
-                for (sub_x = 0; sub_x < MESH_1_LENGTH; sub_x++)
+                for (sub_x = 0; sub_x < Mesh.MESH_2_LENGTH; sub_x++)
                 {
-                    meshes1[sub_x, sub_y] = new Mesh1(this, sub_x, sub_y);
+                    meshes2[sub_x, sub_y] = new Mesh2(this, sub_x, sub_y);
                 }
             }
         }
@@ -39,16 +43,16 @@ namespace meshes
         public void computeCenterOfMass(int[] mapping)
         {
             uint ix, iy;
-            Mesh1 sub;
+            Mesh2 sub;
 
             Vector3.zero(ref centerOfMass);
             mass = 0;
 
-            for (ix = 0; ix < MESH_1_LENGTH; ix++)
+            for (ix = 0; ix < Mesh.MESH_2_LENGTH; ix++)
             {
-                for (iy = 0; iy < MESH_1_LENGTH; iy++)
+                for (iy = 0; iy < Mesh.MESH_2_LENGTH; iy++)
                 {
-                    sub = meshes1[ix, iy];
+                    sub = meshes2[ix, iy];
                     sub.computeCenterOfMass(mapping);
 
                     centerOfMass += sub.centerOfMass * sub.mass;

@@ -18,15 +18,12 @@ namespace meshes
         public uint Count;
 
         public Vector3[] Positions;
-
         public float[] Masses;
 
-        public Mesh[,] MeshesL1;
-        public Mesh[,] MeshesL2;
-
         public Vector3 CenterOfMass;
-
         public int[] Mapping;
+
+        public Mesh mesh;
 
         public ParticleSystem(uint count)
         {
@@ -41,27 +38,7 @@ namespace meshes
                 Masses[i] = Rand.NextSingle() / 2 + 0.5f;
             }
 
-            MeshesL1 = new Mesh[MESH_LENGTH, MESH_LENGTH];
-            MeshesL2 = new Mesh[MESH_L2_LENGTH, MESH_L2_LENGTH];
-
-            for (uint y2 = 0; y2 < MESH_L2_LENGTH; y2++)
-            {
-                for (uint x2 = 0; x2 < MESH_L2_LENGTH; x2++)
-                {
-                    Mesh l2 = new Mesh(x2, y2);
-
-                    MeshesL2[y2, x2] = l2;
-
-                    //generate L1 meshes
-                    for (uint y1 = 0; y1 < MESH_L1_LENGTH; y1++)
-                    {
-                        for (uint x1 = 0; x1 < MESH_L1_LENGTH; x1++)
-                        {
-                            MeshesL1[x2 * MESH_L1_LENGTH + x1, y2 * MESH_L1_LENGTH + y1] = new Mesh(l2, x2 * MESH_L1_LENGTH + x1, y2 * MESH_L1_LENGTH + y1, x1, y1);
-                        }
-                    }
-                }
-            }
+            mesh = new Mesh(7);
         }
 
         public void Tick(float dt)
@@ -120,52 +97,7 @@ namespace meshes
 
         private void ComputeMeshCentersOfMass()
         {
-            uint i, x2, y2, x1, y1, x, y;
-            int mi;
-
-            for (y1 = 0; y1 < MESH_LENGTH ; y1++)
-            {
-                for (x1 = 0; x1 < MESH_LENGTH; x1++)
-                {
-                    MeshesL1[x1, y1].Reset();
-                }
-            }
-
-            for (i = 0; i < Count; i++)
-            {
-                mi = Mapping[i];
-                if (mi == -1)
-                    continue;
-
-                y = (uint)mi / MESH_LENGTH;
-                x = (uint)mi - (y * MESH_LENGTH);
-
-                MeshesL1[x, y].AddParticle(ref Positions[i], Masses[i]);
-            }
-
-            for (y2 = 0; y2 < MESH_L2_LENGTH; y2++)
-            {
-                for (x2 = 0; x2 < MESH_L2_LENGTH; x2++)
-                {
-                    MeshesL2[x2, y2].Reset();
-
-                    for (y1 = 0; y1 < MESH_L1_LENGTH; y1++)
-                    {
-                        for (x1 = 0; x1 < MESH_L1_LENGTH; x1++)
-                        {
-                            x = x2 * MESH_L1_LENGTH + x1;
-                            y = y2 * MESH_L1_LENGTH + y1;
-
-                            MeshesL2[x2, y2].center += MeshesL1[x, y].center;
-                            MeshesL2[x2, y2].mass   += MeshesL1[x, y].mass;
-
-                            MeshesL1[x, y].center /= MeshesL1[x, y].mass;
-                        }
-                    }
-
-                    MeshesL2[x2, y2].center /= MeshesL2[x2, y2].mass;
-                }
-            }
+            mesh.computeCenterOfMass(Mapping);
         }
     }
 }
