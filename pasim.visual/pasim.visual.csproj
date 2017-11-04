@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{68EAE506-8398-4BC6-BC0D-D068329DF10B}</ProjectGuid>
+    <ProjectGuid>{8D746397-BB4B-4474-A241-3C71B9595A42}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>pasim.visual</RootNamespace>
     <AssemblyName>pasim.visual</AssemblyName>
@@ -15,7 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -102,16 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\pasim.core\pasim.core.vcxproj">
-      <Project>{04b29ffa-c0ea-4030-9a09-62eeb4435616}</Project>
-      <Name>pasim.core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\pasim.net\pasim.net.csproj">
-      <Project>{9f682a5f-38f9-42e1-9aa8-3b1853b61601}</Project>
-      <Name>pasim.net</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
