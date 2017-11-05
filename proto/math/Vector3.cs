@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace meshes
+namespace pasim.math
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
@@ -19,7 +19,6 @@ namespace meshes
             x = Rand.NextSingle() * positionMax * 2 - positionMax;
             y = Rand.NextSingle() * positionMax * 2 - positionMax;
             z = Rand.NextSingle() * positionMax * 2 - positionMax;
-            z = 0;
         }
 
         public Vector3(float x, float y, float z)
@@ -39,7 +38,7 @@ namespace meshes
 
         public override string ToString() => $"({x}, {y}, {z})";
 
-        public static float Distance(Vector3 a, Vector3 b)
+        public static float distance(Vector3 a, Vector3 b)
         {
             Vector3 diff = a - b;
             return (float)Math.Sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
@@ -48,6 +47,16 @@ namespace meshes
         public static void zero(ref Vector3 v)
         {
             v.x = v.y = v.z = 0;
+        }
+
+        public static float dot_product(ref Vector3 a, ref Vector3 b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
+        public static float norm(ref Vector3 a)
+        {
+            return (float)Math.Sqrt(dot_product(ref a, ref a));
         }
     }
 }

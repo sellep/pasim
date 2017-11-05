@@ -7,6 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="700">
     <Grid>
+        <TextBlock x:Name="_Info"
+                   TextWrapping="Wrap"
+                   Foreground="White"
+                   FontSize="8"
+                   Panel.ZIndex="10"/>
         <ContentControl x:Name="_RenderTarget" />
     </Grid>
 </Window>

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
+using pasim.core;
+using pasim.math;
 
 namespace meshes
 {
@@ -26,15 +30,25 @@ namespace meshes
     {
         public static float SELECTION_RANGE_MAX = 5f;
 
-        private ParticleSystem _System = null;
+
+        private SimpleParticleSystem _System = null;
         private uint? _Selection = null;
+
+        private Thread _PhysixThread = null;
+        private volatile bool _Terminate = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _System = new ParticleSystem(10000);
-            _System.Tick(12);
+            _System = new SimpleParticleSystem(100000);
+            //_System.positions[0] = new Vector3(-50, 0, 0);
+            //_System.positions[1] = new Vector3(50, 0, 0);
+            //_System.momentums[0] = new Vector3(0, 10f, 0);
+            //_System.momentums[1] = new Vector3(0, -10f, 0);
+            _PhysixThread = new Thread(Computation);
+            Loaded += (s,e) => _PhysixThread.Start();
+
 
             OpenGLControl control = new OpenGLControl();
 
@@ -44,6 +58,38 @@ namespace meshes
             control.MouseLeftButtonDown += Control_MouseLeftButtonDown; ;
 
             _RenderTarget.Content = control;
+        }
+
+        private void Computation()
+        {
+            DateTime start, end;
+            int frames = 0;
+            float averageTime = 0;
+
+            while (!_Terminate)
+            {
+                start = DateTime.Now;
+
+                _System.Tick(0.2f);
+
+                end = DateTime.Now;
+
+                averageTime = averageTime * frames + (float)(end - start).TotalMilliseconds;
+                frames++;
+                averageTime /= frames;
+
+                string info = $"Frame: {frames}{Environment.NewLine}Average time: {averageTime}";
+
+                Dispatcher.BeginInvoke(new Action(() => _Info.Text = info));
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            _Terminate = true;
+            _PhysixThread.Join();
+
+            base.OnClosing(e);
         }
 
         private void Control_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -62,23 +108,23 @@ namespace meshes
 
             Vector3 mouse = new Vector3((float) worldc[0], (float)worldc[1], 0);
 
-            float min = Vector3.Distance(mouse, _System.Positions[0]), current;
-            _Selection = 0;
+            //float min = Vector3.distance(mouse, _System.Positions[0]), current;
+            //_Selection = 0;
 
-            for (uint i = 1; i < _System.Count; i++)
-            {
-                current = Vector3.Distance(mouse, _System.Positions[i]);
-                if (current < min)
-                {
-                    min = current;
-                    _Selection = i;
-                }
-            }
+            //for (uint i = 1; i < _System.Count; i++)
+            //{
+            //    current = Vector3.distance(mouse, _System.Positions[i]);
+            //    if (current < min)
+            //    {
+            //        min = current;
+            //        _Selection = i;
+            //    }
+            //}
 
-            if (min >= SELECTION_RANGE_MAX)
-            {
-                _Selection = null;
-            }
+            //if (min >= SELECTION_RANGE_MAX)
+            //{
+            //    _Selection = null;
+            //}
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
@@ -88,7 +134,7 @@ namespace meshes
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
             gl.LoadIdentity();
 
-            gl.Translate(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
+            //gl.Translate(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
 
             //DrawL1Mesh(gl);
             DrawParticles(gl);
@@ -96,26 +142,65 @@ namespace meshes
             gl.Flush();
         }
 
-        private void DrawParticles(OpenGL gl)
+        private void DrawParticles(OpenGL gl, bool usePoints = true)
         {
-            gl.PointSize(3f);
+            IEnumerable<Vector2> positions = null;
+
+            positions = new List<Vector2>(_System.positions);
+
+            gl.Color(0f, 0.65f, 1f);
+
+            if (usePoints)
+            {
+                gl.PointSize(3f);
+
+                gl.Begin(BeginMode.Points);
+                gl.Color(0f, 0.65f, 1f);
+
+                for (uint i = 0; i < _System.count; i++)
+                {
+                    if (_Selection.HasValue && i == _Selection.Value)
+                        continue;
+
+                    gl.Vertex(_System.positions[i].x, _System.positions[i].y, 0);
+                }
+
+                gl.End();
+            }
+            else
+            {
+                foreach (Vector2 position in positions)
+                {
+                    gl.Begin(BeginMode.LineLoop);
+                    gl.Vertex(position.x, position.y, 0);
+                    gl.Vertex(position.x, position.y + 1, 0);
+                    gl.Vertex(position.x + 1, position.y + 1, 0);
+                    gl.Vertex(position.x, position.y + 1, 0);
+                    gl.End();
+                }
+            }
+            
+
+
+            
+            /*gl.PointSize(3f);
 
             gl.Begin(BeginMode.Points);
             gl.Color(0f, 0.65f, 1f);
             
-            for (uint i = 0; i < _System.Count; i++)
+            for (uint i = 0; i < _System.count; i++)
             {
                 if (_Selection.HasValue && i == _Selection.Value)
                     continue;
 
-                gl.Vertex(_System.Positions[i].x, _System.Positions[i].y, 0);
+                gl.Vertex(_System.positions[i].x, _System.positions[i].y, 0);
             }
 
             if (_Selection.HasValue)
             {
                 gl.Color(1f, 1f, 1f);
-                gl.Vertex(_System.Positions[_Selection.Value].x, _System.Positions[_Selection.Value].y, 0);
-            }
+                gl.Vertex(_System.positions[_Selection.Value].x, _System.positions[_Selection.Value].y, 0);
+            }*/
 
             /*// Create a Vector Buffer Object that will store the vertices on video memory
 2 	GLuint vbo;
@@ -129,54 +214,6 @@ namespace meshes
             gl.End();
         }
 
-        private void DrawCenterOfMass(OpenGL gl)
-        {
-            gl.Color(1f, 1f, 0f, 0.7f);
-            gl.PointSize(2f);
-
-            gl.Begin(BeginMode.Points);
-
-            gl.Vertex(_System.CenterOfMass.x, _System.CenterOfMass.y, 0);
-
-            gl.End();
-        }
-
-        //private void DrawL1Mesh(OpenGL gl)
-        //{
-        //    float x, y;
-        //    uint x1, y1;
-
-        //    gl.Color(0f, 1f, 0f, 0.5f);
-        //    gl.LineWidth(10f);
-
-        //    for (y1 = 0; y1 < ParticleSystem.MESH_LENGTH; y1++)
-        //    {
-        //        for (x1 = 0; x1 < ParticleSystem.MESH_LENGTH; x1++)
-        //        {
-        //            x = _System.MeshesL1[x1, y1].x * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.x;
-        //            y = _System.MeshesL1[x1, y1].y * ParticleSystem.MESH_NODE_L1_LENGTH - ParticleSystem.MESH_WIDTH / 2 + _System.CenterOfMass.y;
-
-        //            gl.Begin(BeginMode.LineStrip);
-
-        //            if (x1 == 0)
-        //            {
-        //                gl.Vertex(x, y, 0f);
-        //            }
-
-        //            gl.Vertex(x, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
-        //            gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y + ParticleSystem.MESH_NODE_L1_LENGTH, 0f);
-        //            gl.Vertex(x + ParticleSystem.MESH_NODE_L1_LENGTH, y, 0f);
-
-        //            if (y1 == 0)
-        //            {
-        //                gl.Vertex(x, y, 0f);
-        //            }
-
-        //            gl.End();
-        //        }
-        //    }
-        //}
-
         private void Control_Resized(object sender, OpenGLEventArgs args)
         {
             OpenGL gl = args.OpenGL;
@@ -186,7 +223,7 @@ namespace meshes
             gl.LoadIdentity();
 
             //gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, LENGTH);
-            gl.Ortho(-ParticleSystem.MESH_WIDTH, ParticleSystem.MESH_WIDTH, -ParticleSystem.MESH_WIDTH, ParticleSystem.MESH_WIDTH, 1, -1);
+            gl.Ortho(-SimpleParticleSystem.POSITION_MAX * 1.5, SimpleParticleSystem.POSITION_MAX * 1.5, -SimpleParticleSystem.POSITION_MAX * 1.5, SimpleParticleSystem.POSITION_MAX * 1.5, 1, -1);
 
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
         }

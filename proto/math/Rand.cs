@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace meshes
+namespace pasim.math
 {
 
     public static class Rand

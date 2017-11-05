@@ -15,7 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -64,12 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Mesh1.cs" />
-    <Compile Include="Mesh2.cs" />
-    <Compile Include="Mesh3.cs" />
-    <Compile Include="Rand.cs" />
-    <Compile Include="ParticleSystem.cs" />
-    <Compile Include="Vector3.cs" />
+    <Compile Include="Rect3.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -110,6 +105,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\core\core.csproj">
+      <Project>{c4f2f5ea-11bd-4795-8d28-61b3e35a8321}</Project>
+      <Name>core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cusim\cusim.csproj">
+      <Project>{aa364987-6a38-4750-aa01-39bbb3e83264}</Project>
+      <Name>cusim</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\math\math.csproj">
+      <Project>{d8bd4f1e-a0d8-41b7-8175-e856cfd309c7}</Project>
+      <Name>math</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "meshes", "meshes\meshes.csproj", "{8FDE4F6A-2603-4116-A311-D7BBC4862C50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cusim", "cusim\cusim.csproj", "{AA364987-6A38-4750-AA01-39BBB3E83264}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "math", "math\math.csproj", "{D8BD4F1E-A0D8-41B7-8175-E856CFD309C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "core\core.csproj", "{C4F2F5EA-11BD-4795-8D28-61B3E35A8321}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{8FDE4F6A-2603-4116-A311-D7BBC4862C50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FDE4F6A-2603-4116-A311-D7BBC4862C50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FDE4F6A-2603-4116-A311-D7BBC4862C50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA364987-6A38-4750-AA01-39BBB3E83264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA364987-6A38-4750-AA01-39BBB3E83264}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA364987-6A38-4750-AA01-39BBB3E83264}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA364987-6A38-4750-AA01-39BBB3E83264}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8BD4F1E-A0D8-41B7-8175-E856CFD309C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8BD4F1E-A0D8-41B7-8175-E856CFD309C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8BD4F1E-A0D8-41B7-8175-E856CFD309C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8BD4F1E-A0D8-41B7-8175-E856CFD309C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4F2F5EA-11BD-4795-8D28-61B3E35A8321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4F2F5EA-11BD-4795-8D28-61B3E35A8321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4F2F5EA-11BD-4795-8D28-61B3E35A8321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4F2F5EA-11BD-4795-8D28-61B3E35A8321}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
