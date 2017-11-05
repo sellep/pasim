@@ -2,8 +2,7 @@
 
 __global__ compute_delta_momentum_shmem(
     float3       * const dps,
-    float4 const * const bodies,
-    uint           const N)
+    float4 const * const bodies)
 {
     extern __shared__ float4 sh_bodies[];
     float4 bi;

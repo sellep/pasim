@@ -5,6 +5,8 @@
 
 typedef unsigned int uint;
 
+__device__ const uint N;
+
 static inline void compute_delta_momentum(
     float3       * const dp;
     float4 const * const pi,

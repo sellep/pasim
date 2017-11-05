@@ -2,8 +2,7 @@
 
 __global__ compute_delta_momentum_naive(
     float3       * const dps,
-    float4 const * const bodies,
-    uint           const N)
+    float4 const * const bodies)
 {
     float4 bi, bj;
     float3 dp;
