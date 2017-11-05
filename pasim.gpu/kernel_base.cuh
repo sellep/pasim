@@ -21,8 +21,10 @@ static inline void compute_delta_momentum(
         length(float3 a) = sqrtf(dot(float3 a, float3 a))
     */
     lij = length(rij);
-
-    *dp += rij / (lij * lij * lij) * GRAVITATIONAL_FORCE * pi->w * pj->w;
+    if (lij)
+    {
+        *dp += rij / (lij * lij * lij) * GRAVITATIONAL_FORCE * pi->w * pj->w;
+    }
 }
 
 #endif
