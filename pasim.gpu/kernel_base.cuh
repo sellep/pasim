@@ -5,9 +5,7 @@
 
 typedef unsigned int uint;
 
-__device__ const uint N;
-
-static inline void compute_delta_momentum(
+static inline void delta_momentum(
     float3       * const dp;
     float4 const * const pi,
     float4 const * const pj)
@@ -23,6 +21,10 @@ static inline void compute_delta_momentum(
         length(float3 a) = sqrtf(dot(float3 a, float3 a))
     */
     lij = length(rij);
+
+    /**
+        if there is no distance, we don't do anything ...
+    */
     if (lij)
     {
         *dp += rij / (lij * lij * lij) * GRAVITATIONAL_FORCE * pi->w * pj->w;

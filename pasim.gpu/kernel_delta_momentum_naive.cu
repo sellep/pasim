@@ -1,8 +1,10 @@
 #include "kernel_base.cuh"
 
-__global__ compute_delta_momentum_naive(
+__global__ delta_momentum_naive(
     float3       * const dps,
-    float4 const * const bodies)
+    float4 const * const bodies
+    uint           const N
+    float          const dt)
 {
     float4 bi, bj;
     float3 dp;
@@ -17,9 +19,9 @@ __global__ compute_delta_momentum_naive(
         {
             bj = bodies[j];
 
-            compute_delta_momentum(&dp, &bi, &bj);
+            delta_momentum(&dp, &bi, &bj);
         }
 
-        dps[i] = dp;
+        dps[i] = dp * dt;
     }
 }

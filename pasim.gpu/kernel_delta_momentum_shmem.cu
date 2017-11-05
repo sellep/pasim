@@ -1,8 +1,10 @@
 #include "kernel_base.cuh"
 
-__global__ compute_delta_momentum_shmem(
+__global__ delta_momentum_shmem(
     float3       * const dps,
-    float4 const * const bodies)
+    float4 const * const bodies,
+    uint           const N
+    float          const dt)
 {
     extern __shared__ float4 sh_bodies[];
     float4 bi;
@@ -21,14 +23,17 @@ __global__ compute_delta_momentum_shmem(
 
             __syncthreads();
 
+            /**
+                maybe #pragma unroll here as well?
+            */
             for (k = 0; k < blockDim.x; k++)
             {
-                compute_delta_momentum(&dp, &bi, sh_bodies + k);
+                delta_momentum(&dp, &bi, sh_bodies + k);
             }
 
             __syncthreads();
         }
 
-        dps[i] = dp;
+        dps[i] = dp * dt;
     }
 }
