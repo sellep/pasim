@@ -1,9 +1,9 @@
 #include "kernel_base.cuh"
 
-__global__ delta_momentum_naive(
+__global__ void delta_momentum_naive(
     float3       * const dps,
-    float4 const * const bodies
-    uint           const N
+    float4 const * const bodies,
+    uint           const N,
     float          const dt)
 {
     float4 bi, bj;
@@ -13,9 +13,9 @@ __global__ delta_momentum_naive(
     for (i = blockDim.x * blockIdx.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x)
     {
         bi = bodies[i];
-        dp = make_float3(0);
+        dp = make_float3(0, 0, 0);
 
-        for (j = 0; j < N, j++)
+        for (j = 0; j < N; j++)
         {
             bj = bodies[j];
 

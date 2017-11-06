@@ -1,9 +1,9 @@
 #include "kernel_base.cuh"
 
-__global__ delta_momentum_shmem(
+__global__ void delta_momentum_shmem(
     float3       * const dps,
     float4 const * const bodies,
-    uint           const N
+    uint           const N,
     float          const dt)
 {
     extern __shared__ float4 sh_bodies[];
@@ -14,7 +14,7 @@ __global__ delta_momentum_shmem(
     for (i = blockDim.x * blockIdx.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x)
     {
         bi = bodies[i];
-        dp = make_float3(0);
+        dp = make_float3(0, 0, 0);
 
 #pragma unroll 2
         for (j = 0; j < N; j += blockDim.x)

@@ -1,12 +1,17 @@
 #ifndef __PASIM_DEFINITIONS_H
 #define __PASIM_DEFINITIONS_H 1
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
+#include "helper_math.h"
+
 #define GRAVITATIONAL_FORCE 1
 
 typedef unsigned int uint;
 
-static inline void delta_momentum(
-    float3       * const dp;
+static inline __device__ void delta_momentum(
+    float3       * const dp,
     float4 const * const pi,
     float4 const * const pj)
 {
