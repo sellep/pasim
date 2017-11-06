@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public class KernelComparison
+    public class ApplyMomentumComparison
     {
 
-        public KernelComparison(string module, float ms, dim3 gridDim, dim3 blockDim)
+        public ApplyMomentumComparison(string module, float ms, dim3 gridDim, dim3 blockDim)
         {
             Module = module;
             MS = ms;

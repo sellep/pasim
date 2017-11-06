@@ -13,25 +13,14 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public abstract class ApplyMomentumBase
+    public abstract class ApplyMomentumBase: TestBase
     {
-        public const string KERNEL_PATTERN = "kernel_apply_momentum_*.ptx";
-
-        protected CudaContext _Context;
-        protected Dictionary<string, CUmodule> _Modules = new Dictionary<string, CUmodule>();
+        protected override string _KernelPattern => "kernel_apply_momentum_*.ptx";
 
         public ApplyMomentumBase(string kernelDirectory, CudaContext ctx)
+            : base (kernelDirectory, ctx)
         {
-            foreach (string file in Directory.GetFiles(kernelDirectory, KERNEL_PATTERN))
-            {
-                Console.WriteLine($"found module {Path.GetFileName(file)}");
-                _Modules.Add(file, ctx.LoadModule(file));
-            }
 
-            if (_Modules.Count == 0)
-                throw new Exception("No kernels found");
-
-            _Context = ctx;
         }
 
         protected CudaKernel CreateCudaKernel(string file, CUmodule module, dim3 gridDim, dim3 blockDim)

@@ -25,7 +25,7 @@ namespace pasim.test
 
         public void Validate(dim3 gridDim, dim3 blockDim)
         {
-            List<KernelValidation> validations = new List<KernelValidation>();
+            List<ApplyMomentumValidation> validations = new List<ApplyMomentumValidation>();
             uint i;
 
             foreach (string file in _Modules.Keys)
@@ -35,7 +35,7 @@ namespace pasim.test
                 CudaKernel kernel = CreateCudaKernel(file, _Modules[file], gridDim, blockDim);
                 kernel.Run(_System.DevBodies, _System.DevMomentums, _System.N, 0.01f);
 
-                validations.Add(new KernelValidation(file, _System.GetDeviceBodies()));
+                validations.Add(new ApplyMomentumValidation(file, _System.GetDeviceBodies()));
             }
 
             for (i = 0; i < _System.N; i++)
@@ -45,7 +45,7 @@ namespace pasim.test
 
                 float4 root = validations.First().Bodies[i];
 
-                foreach (KernelValidation validation in validations)
+                foreach (ApplyMomentumValidation validation in validations)
                 {
                     if (validation.Bodies[i] != root)
                     {

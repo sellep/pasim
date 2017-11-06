@@ -13,10 +13,11 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{135D514F-B274-461D-AF5A-01675DC21F58}</ProjectGuid>
     <RootNamespace>pasim_gpu</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
@@ -87,12 +88,11 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="kernel_apply_momentum_naive_1.cu" />
     <CudaCompile Include="kernel_apply_momentum_shmem_2.cu" />
     <CudaCompile Include="kernel_apply_momentum_shmem_1.cu" />
     <CudaCompile Include="kernel_delta_momentum_naive.cu" />
-    <CudaCompile Include="kernel_delta_momentum_shmem.cu" />
+    <CudaCompile Include="kernel_delta_momentum_shmem_1_u2.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper_math.h" />

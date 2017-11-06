@@ -47,11 +47,14 @@
   <ItemGroup>
     <Compile Include="ApplyMomentumKernelComparer.cs" />
     <Compile Include="ApplyMomentumKernelValidator.cs" />
-    <Compile Include="KernelComparison.cs" />
-    <Compile Include="KernelValidation.cs" />
+    <Compile Include="ApplyMomentumComparison.cs" />
+    <Compile Include="ApplyMomentumValidation.cs" />
+    <Compile Include="DeltaMomentumBase.cs" />
+    <Compile Include="DeltaMomentumKernelComparer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApplyMomentumBase.cs" />
+    <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

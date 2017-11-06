@@ -1,24 +1,20 @@
 ﻿using ManagedCuda;
-using ManagedCuda.BasicTypes;
-using ManagedCuda.VectorTypes;
 using pasim.core;
-using pasim.core.Helper;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace pasim.test
 {
 
-    public class ApplyMomentumKernelComparer : ApplyMomentumBase
+    public class DeltaMomentumKernelComparer : DeltaMomentumBase
     {
+
         private ParticleSystem _System;
 
-        public ApplyMomentumKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
+        public DeltaMomentumKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
             : base(kernelDirectory, ctx)
         {
             _System = system;
