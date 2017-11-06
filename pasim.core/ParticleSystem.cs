@@ -14,9 +14,16 @@ namespace pasim.core
     public class ParticleSystem : IDisposable
     {
         private CudaContext _Ctx;
+
+        private KernelBase _DeltaMomentumKernel;
+        private dim3 _DeltaMomentumGridDim;
+        private dim3 _DeltaMomentumBlockDim;
+
         private KernelBase _ApplyMomentumKernel;
         private dim3 _ApplyMomentumGridDim;
         private dim3 _ApplyMomentumBlockDim;
+
+        public uint N { get; }
 
         public float4[] Bodies { get; }
 
@@ -32,6 +39,7 @@ namespace pasim.core
         {
             _Ctx = ctx;
 
+            this.N = N;
             Bodies = InitializeBodies(N, posMax, massMin, massMax);
             Momentums = InitializeMomentums(N, momMax);
 
@@ -39,8 +47,20 @@ namespace pasim.core
             DevMomentums = ctx.AllocateMemory(Marshal.SizeOf(typeof(float3)) * N);
             DevDeltaMomentums = ctx.AllocateMemory(Marshal.SizeOf(typeof(float3)) * N);
 
-            ctx.CopyToDevice(DevBodies, Bodies);
-            ctx.CopyToDevice(DevMomentums, Momentums);
+            SyncDevice();
+        }
+
+        public void SyncDevice()
+        {
+            _Ctx.CopyToDevice(DevBodies, Bodies);
+            _Ctx.CopyToDevice(DevMomentums, Momentums);
+        }
+
+        public float4[] GetDeviceBodies()
+        {
+            float4[] bodies = new float4[N];
+            _Ctx.CopyToHost(bodies, DevBodies);
+            return bodies;
         }
 
         public void SetApplyMomentumKernel(KernelBase kernel, dim3 gridDim, dim3 blockDim)
@@ -48,6 +68,11 @@ namespace pasim.core
             _ApplyMomentumKernel = kernel;
             _ApplyMomentumGridDim = gridDim;
             _ApplyMomentumBlockDim = blockDim;
+        }
+
+        public void Tick(float dt)
+        {
+            _ApplyMomentumKernel.Launch(dt);
         }
 
         private static float3[] InitializeMomentums(uint N, float momMax)

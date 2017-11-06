@@ -14,7 +14,7 @@ namespace pasim.core
 
     public abstract class KernelBase
     {
-        protected abstract object[] _Args { get; }
+        protected abstract object[] _StaticArgs { get; }
 
         protected CudaContext _Context;
         protected CUmodule _Module;
@@ -36,9 +36,12 @@ namespace pasim.core
             _Kernel.BlockDimensions = blockDim;
         }
 
-        public float Launch()
+        public float Launch(float dt)
         {
-            return _Kernel.Run(_Args);
+            List<object> args = new List<object>(_StaticArgs);
+            args.Add(dt);
+
+            return _Kernel.Run(args.ToArray());
         }
     }
 }

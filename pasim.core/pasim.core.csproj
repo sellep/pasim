@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeltaMomentumNaiveKernel.cs" />
     <Compile Include="Helper\PTXReader.cs" />
     <Compile Include="KernelBase.cs" />
     <Compile Include="ParticleSystem.cs" />
@@ -51,13 +52,6 @@
     <Compile Include="Rand.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\pasim.gpu\x64\Debug\kernel_apply_momentum_naive.ptx">
-      <Link>Kernels\kernel_apply_momentum_naive.ptx</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\pasim.gpu\x64\Debug\kernel_delta_momentum_naive.ptx">
-      <Link>Kernels\kernel_delta_momentum_naive.ptx</Link>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

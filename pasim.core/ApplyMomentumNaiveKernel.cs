@@ -12,20 +12,21 @@ namespace pasim.core
 {
     public class ApplyMomentumNaiveKernel : KernelBase
     {
-        private const string KERNEL_FILE_NAME = "kernel_apply_momentum_naive.ptx";
+        private const string MODULE = "kernel_apply_momentum_naive.ptx";
+
         private object[] _KernelArgs;
 
+        protected override object[] _StaticArgs => _KernelArgs;
+
         public ApplyMomentumNaiveKernel(CudaContext context)
-            : base(context, KERNEL_FILE_NAME)
+            : base(context, MODULE)
         {
 
         }
 
-        protected override object[] _Args => _KernelArgs;
-
-        public void SetParameter(CUdeviceptr bs, CUdeviceptr ps, CUdeviceptr dps, float N, float dt)
+        public void SetConstants(CUdeviceptr bs, CUdeviceptr ps, CUdeviceptr dps, float N)
         {
-            _KernelArgs = new object[] { bs, ps, dps, N, dt };
+            _KernelArgs = new object[] { bs, ps, dps, N };
         }
     }
 }
