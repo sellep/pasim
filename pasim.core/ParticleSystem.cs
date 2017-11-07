@@ -68,16 +68,19 @@ namespace pasim.core
             _Ctx.CopyToDevice(DevMomentums, momentums);
         }
 
-        public float Tick(float dt, float4[] bodies)
+        public float Tick(float dt)
         {
             float ms = 0;
 
             ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
             ms += _PositionKernel.Run(DevBodies, DevMomentums, N, dt);
 
-            _Ctx.CopyToHost(bodies, DevBodies);
-
             return ms;
+        }
+
+        public void Synchronize(float4[] bodies)
+        {
+            _Ctx.CopyToHost(bodies, DevBodies);
         }
 
         public void SetMomentumKernel(string modulePath, dim3 gridDim, dim3 blockDim)

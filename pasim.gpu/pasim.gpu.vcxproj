@@ -90,7 +90,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
   <ItemGroup>
     <CudaCompile Include="kernel_momentum_shmem_b7_u2_u8.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u4_u8.cu" />
-    <CudaCompile Include="kernel_position_naive_1.cu" />
+    <CudaCompile Include="kernel_position_naive.cu" />
     <CudaCompile Include="kernel_position_shmem_2.cu" />
     <CudaCompile Include="kernel_position_shmem_1.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u16.cu" />

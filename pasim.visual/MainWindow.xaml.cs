@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace pasim.visual
 {
@@ -27,12 +28,14 @@ namespace pasim.visual
     {
         public const float VIEW_MAX = 500;
         public const float POSITION_MAX = 100;
+        public const float DT = 0.5f;
 
         private float _RotateY = 0;
 
         private float4[] _Bodies = null;
 
-        private ParticleSystem _System = null;
+        private readonly object _Sync = new object();
+        private volatile bool _Terminate = false;
         private Thread _PhysicsThread = null;
 
         public MainWindow()
@@ -48,9 +51,28 @@ namespace pasim.visual
             _RenderTarget.Content = control;
 
             _Bodies = ParticleSystem.InitializeBodies(1024 * 4, POSITION_MAX, 0.5f, 1f);
-            //float3[] momentums = ParticleSystem.InitializeMomentums(1024 * 4, 0.1f);
 
-            //_System = new ParticleSystem(_Bodies, momentums);
+            _PhysicsThread = new Thread(() =>
+            {
+                ParticleSystem system = new ParticleSystem(_Bodies, ParticleSystem.InitializeMomentums(1024 * 4, 0.1f));
+
+                system.SetMomentumKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_momentum_shmem_b7_u8.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
+                system.SetPositionKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_position_naive.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
+
+                while (!_Terminate)
+                {
+                    system.Tick(DT);
+
+                    lock (_Sync)
+                    {
+                        system.Synchronize(_Bodies);
+                    }
+                }
+
+                system.Dispose();
+            });
+
+            _PhysicsThread.Start();
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
@@ -66,15 +88,18 @@ namespace pasim.visual
             gl.Rotate(0f, _RotateY, 0f);
 
             //draw particles
-            gl.Color(0f, 0.65f, 1f);
-            gl.Begin(BeginMode.Points);
-
-            for (uint i = 0; i < _Bodies.Length; i++)
+            lock (_Sync)
             {
-                gl.Vertex(_Bodies[i].x, _Bodies[i].y, _Bodies[i].z);
-            }
+                gl.Color(0f, 0.65f, 1f);
+                gl.Begin(BeginMode.Points);
 
-            gl.End();
+                for (uint i = 0; i < _Bodies.Length; i++)
+                {
+                    gl.Vertex(_Bodies[i].x, _Bodies[i].y, _Bodies[i].z);
+                }
+
+                gl.End();
+            }
 
             //draw boundary
             //gl.Color(0f, 1f, 0f);
@@ -108,7 +133,7 @@ namespace pasim.visual
 
             gl.Flush();
 
-            _RotateY += 0.1f;
+            _RotateY += 0.01f;
         }
 
         private void Control_Resized(object sender, OpenGLEventArgs args)
@@ -173,5 +198,12 @@ namespace pasim.visual
             //    _Selection = null;
             //}
         }*/
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            _Terminate = true;
+
+            base.OnClosing(e);
+        }
     }
 }
