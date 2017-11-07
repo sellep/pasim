@@ -72,7 +72,7 @@ namespace pasim.core
         {
             float ms = 0;
 
-            ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
+            //ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
             ms += _PositionKernel.Run(DevBodies, DevMomentums, N, dt);
 
             return ms;

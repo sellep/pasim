@@ -1,8 +1,8 @@
 #include "kernel_base.cuh"
 
-__global__ void apply_momentum_naive_2(
+__global__ void position_naive(
     float4       * const bs,
-    float3       * const ps,
+    float3 const * const ps,
     float          const N,
     float          const dt)
 {

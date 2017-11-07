@@ -26,9 +26,10 @@ namespace pasim.visual
 
     public partial class MainWindow : Window
     {
-        public const float VIEW_MAX = 500;
+        public const float VIEW_MAX = 200;
         public const float POSITION_MAX = 100;
-        public const float DT = 0.5f;
+        public const uint N = 2;
+        public const float DT = 100f;
 
         private float _RotateY = 0;
 
@@ -50,11 +51,11 @@ namespace pasim.visual
 
             _RenderTarget.Content = control;
 
-            _Bodies = ParticleSystem.InitializeBodies(1024 * 4, POSITION_MAX, 0.5f, 1f);
+            _Bodies = ParticleSystem.InitializeBodies(N, POSITION_MAX, 0.5f, 1f);
 
             _PhysicsThread = new Thread(() =>
             {
-                ParticleSystem system = new ParticleSystem(_Bodies, ParticleSystem.InitializeMomentums(1024 * 4, 0.1f));
+                ParticleSystem system = new ParticleSystem(_Bodies, ParticleSystem.InitializeMomentums(N, 10f));
 
                 system.SetMomentumKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_momentum_shmem_b7_u8.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
                 system.SetPositionKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_position_naive.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
@@ -84,12 +85,13 @@ namespace pasim.visual
 
             gl.PushMatrix();
 
-            gl.Translate(0, 0, -300);
+            gl.Translate(0, 0, -VIEW_MAX * 1.5f);
             gl.Rotate(0f, _RotateY, 0f);
 
             //draw particles
             lock (_Sync)
             {
+                gl.PointSize(3f);
                 gl.Color(0f, 0.65f, 1f);
                 gl.Begin(BeginMode.Points);
 
@@ -102,32 +104,32 @@ namespace pasim.visual
             }
 
             //draw boundary
-            //gl.Color(0f, 1f, 0f);
+            gl.Color(0f, 1f, 0f);
 
-            //gl.Begin(BeginMode.LineLoop);
-            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
-            //gl.End();
+            gl.Begin(BeginMode.LineLoop);
+            gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            gl.End();
 
-            //gl.Begin(BeginMode.LineLoop);
-            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
-            //gl.End();
+            gl.Begin(BeginMode.LineLoop);
+            gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            gl.End();
 
-            //gl.Begin(BeginMode.Lines);
-            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
-            //gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
-            //gl.End();
+            gl.Begin(BeginMode.Lines);
+            gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            gl.End();
 
             gl.PopMatrix();
 
@@ -144,7 +146,7 @@ namespace pasim.visual
             gl.MatrixMode(OpenGL.GL_PROJECTION);
             gl.LoadIdentity();
 
-            gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, VIEW_MAX);
+            gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, 3 * VIEW_MAX);
             //gl.Ortho(-VIEW_MAX, VIEW_MAX, -VIEW_MAX, VIEW_MAX, 1, -1);
 
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
