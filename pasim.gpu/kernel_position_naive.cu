@@ -15,9 +15,9 @@ __global__ void position_naive(
 		bi = bs[i];
 		pi = ps[i];
 
-		bi.x = pi.x * dt / bi.w;
-		bi.y = pi.y * dt / bi.w;
-		bi.z = pi.z * dt / bi.w;
+		bi.x += pi.x * dt / bi.w;
+		bi.y += pi.y * dt / bi.w;
+		bi.z += pi.z * dt / bi.w;
 
 		bs[i] = bi;
     }

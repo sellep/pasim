@@ -28,8 +28,9 @@ namespace pasim.visual
     {
         public const float VIEW_MAX = 200;
         public const float POSITION_MAX = 100;
+        public const float MOMENTUM_MAX = 1f;
         public const uint N = 2;
-        public const float DT = 100f;
+        public const float DT = 0.1f;
 
         private float _RotateY = 0;
 
@@ -55,7 +56,9 @@ namespace pasim.visual
 
             _PhysicsThread = new Thread(() =>
             {
-                ParticleSystem system = new ParticleSystem(_Bodies, ParticleSystem.InitializeMomentums(N, 10f));
+                float3[] initialMomentums = ParticleSystem.InitializeMomentums(N, MOMENTUM_MAX);
+
+                ParticleSystem system = new ParticleSystem(_Bodies, initialMomentums);
 
                 system.SetMomentumKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_momentum_shmem_b7_u8.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
                 system.SetPositionKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_position_naive.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
