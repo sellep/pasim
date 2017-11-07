@@ -1,6 +1,7 @@
 ﻿using ManagedCuda;
 using ManagedCuda.BasicTypes;
 using ManagedCuda.VectorTypes;
+using pasim.core.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,46 +15,86 @@ namespace pasim.core
     public class ParticleSystem : IDisposable
     {
         private CudaContext _Ctx;
-
-        private KernelBase _DeltaMomentumKernel;
-        private dim3 _DeltaMomentumGridDim;
-        private dim3 _DeltaMomentumBlockDim;
-
-        private KernelBase _ApplyMomentumKernel;
-        private dim3 _ApplyMomentumGridDim;
-        private dim3 _ApplyMomentumBlockDim;
+        private CudaKernel _MomentumKernel = null;
+        private CudaKernel _PositionKernel = null;
 
         public uint N { get; }
-
-        public float4[] Bodies { get; }
-
-        public float3[] Momentums { get; }
 
         public CUdeviceptr DevBodies { get; }
 
         public CUdeviceptr DevMomentums { get; }
 
-        public CUdeviceptr DevDeltaMomentums { get; }
-
-        public ParticleSystem(CudaContext ctx, uint N, float posMax, float massMin, float massMax, float momMax)
+        public static float4[] InitializeBodies(uint N, float posMax, float massMin, float massMax)
         {
-            _Ctx = ctx;
+            float4[] bs = new float4[N];
 
-            this.N = N;
-            Bodies = InitializeBodies(N, posMax, massMin, massMax);
-            Momentums = InitializeMomentums(N, momMax);
+            for (uint i = 0; i < N; i++)
+            {
+                bs[i] = new float4(
+                    Rand.Nextf(posMax * 2) - posMax,
+                    Rand.Nextf(posMax * 2) - posMax,
+                    Rand.Nextf(posMax * 2) - posMax,
+                    Rand.Nextf(massMin, massMax));
+            }
 
-            DevBodies = ctx.AllocateMemory(Marshal.SizeOf(typeof(float4)) * N);
-            DevMomentums = ctx.AllocateMemory(Marshal.SizeOf(typeof(float3)) * N);
-            DevDeltaMomentums = ctx.AllocateMemory(Marshal.SizeOf(typeof(float3)) * N);
-
-            SyncDevice();
+            return bs;
         }
 
-        public void SyncDevice()
+        public static float3[] InitializeMomentums(uint N, float momMax)
         {
-            _Ctx.CopyToDevice(DevBodies, Bodies);
-            _Ctx.CopyToDevice(DevMomentums, Momentums);
+            float3[] ps = new float3[N];
+
+            for (uint i = 0; i < N; i++)
+            {
+                ps[i] = new float3(
+                    Rand.Nextf(momMax * 2) - momMax,
+                    Rand.Nextf(momMax * 2) - momMax,
+                    Rand.Nextf(momMax * 2) - momMax);
+            }
+
+            return ps;
+        }
+
+        public ParticleSystem(float4[] bodies, float3[] momentums)
+        {
+            _Ctx = new CudaContext();
+
+            N = (uint)bodies.Length;
+
+            DevBodies = _Ctx.AllocateMemory(Marshal.SizeOf(typeof(float4)) * N);
+            DevMomentums = _Ctx.AllocateMemory(Marshal.SizeOf(typeof(float3)) * N);
+
+            _Ctx.CopyToDevice(DevBodies, bodies);
+            _Ctx.CopyToDevice(DevMomentums, momentums);
+        }
+
+        public float Tick(float dt, float4[] bodies)
+        {
+            float ms = 0;
+
+            ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
+            ms += _PositionKernel.Run(DevBodies, DevMomentums, N, dt);
+
+            _Ctx.CopyToHost(bodies, DevBodies);
+
+            return ms;
+        }
+
+        public void SetMomentumKernel(string modulePath, dim3 gridDim, dim3 blockDim)
+        {
+            string kernel = PTXReader.ReadEntryPoint(modulePath);
+            uint? shmem_size = KernelDescriptor.BlockDimension(modulePath);
+
+            CUmodule module = _Ctx.LoadModulePTX(modulePath);
+            _MomentumKernel = new CudaKernel(kernel, module, _Ctx, blockDim, gridDim, shmem_size.GetValueOrDefault(0));
+        }
+
+        public void SetPositionKernel(string modulePath, dim3 gridDim, dim3 blockDim)
+        {
+            string kernel = PTXReader.ReadEntryPoint(modulePath);
+
+            CUmodule module = _Ctx.LoadModulePTX(modulePath);
+            _PositionKernel = new CudaKernel(kernel, module, _Ctx, blockDim, gridDim);
         }
 
         public float4[] GetDeviceBodies()
@@ -63,47 +104,11 @@ namespace pasim.core
             return bodies;
         }
 
-        public void SetApplyMomentumKernel(KernelBase kernel, dim3 gridDim, dim3 blockDim)
-        {
-            _ApplyMomentumKernel = kernel;
-            _ApplyMomentumGridDim = gridDim;
-            _ApplyMomentumBlockDim = blockDim;
-        }
-
-        public void Tick(float dt)
-        {
-            _ApplyMomentumKernel.Launch(dt);
-        }
-
-        private static float3[] InitializeMomentums(uint N, float momMax)
-        {
-            float3[] ps = new float3[N];
-
-            for (uint i = 0; i < N; i++)
-            {
-                ps[i] = new float3(Rand.Nextf(momMax), Rand.Nextf(momMax), Rand.Nextf(momMax));
-            }
-
-            return ps;
-        }
-
-        private static float4[] InitializeBodies(uint N, float posMax, float massMin, float massMax)
-        {
-            float4[] bs = new float4[N];
-
-            for (uint i = 0; i < N; i++)
-            {
-                bs[i] = new float4(Rand.Nextf(posMax), Rand.Nextf(posMax), Rand.Nextf(posMax), Rand.Nextf(massMin, massMax));
-            }
-
-            return bs;
-        }
-
         public void Dispose()
         {
             _Ctx.FreeMemory(DevBodies);
             _Ctx.FreeMemory(DevMomentums);
-            _Ctx.FreeMemory(DevDeltaMomentums);
+            _Ctx.Dispose();
         }
     }
 }

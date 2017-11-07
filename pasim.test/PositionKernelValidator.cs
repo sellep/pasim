@@ -12,12 +12,11 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public class ApplyMomentumKernelValidator : ApplyMomentumBase
+    public class PositionKernelValidator : PositionBase
     {
         private ParticleSystem _System;
-        
 
-        public ApplyMomentumKernelValidator(string kernelDirectory, CudaContext ctx, ParticleSystem system)
+        public PositionKernelValidator(string kernelDirectory, CudaContext ctx, ParticleSystem system)
             : base(kernelDirectory, ctx)
         {
             _System = system;
@@ -25,7 +24,7 @@ namespace pasim.test
 
         public void Validate(dim3 gridDim, dim3 blockDim)
         {
-            List<ApplyMomentumValidation> validations = new List<ApplyMomentumValidation>();
+            List<MomentumValidation> validations = new List<MomentumValidation>();
             uint i;
 
             foreach (string file in _Modules.Keys)
@@ -35,7 +34,7 @@ namespace pasim.test
                 CudaKernel kernel = CreateCudaKernel(file, _Modules[file], gridDim, blockDim);
                 kernel.Run(_System.DevBodies, _System.DevMomentums, _System.N, 0.01f);
 
-                validations.Add(new ApplyMomentumValidation(file, _System.GetDeviceBodies()));
+                validations.Add(new MomentumValidation(file, _System.GetDeviceBodies()));
             }
 
             for (i = 0; i < _System.N; i++)
@@ -45,7 +44,7 @@ namespace pasim.test
 
                 float4 root = validations.First().Bodies[i];
 
-                foreach (ApplyMomentumValidation validation in validations)
+                foreach (MomentumValidation validation in validations)
                 {
                     if (validation.Bodies[i] != root)
                     {

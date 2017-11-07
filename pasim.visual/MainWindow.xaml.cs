@@ -1,10 +1,14 @@
-﻿using SharpGL;
+﻿using ManagedCuda.VectorTypes;
+using pasim.core;
+using SharpGL;
+using SharpGL.Enumerations;
 using SharpGL.SceneGraph;
 using SharpGL.WPF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,10 +26,14 @@ namespace pasim.visual
     public partial class MainWindow : Window
     {
         public const float VIEW_MAX = 500;
+        public const float POSITION_MAX = 100;
 
-        private volatile bool _Invalidated = true;
-        private uint[] _VertexBuffer = new uint[1];
-        private bool _UseVertexArray = false;
+        private float _RotateY = 0;
+
+        private float4[] _Bodies = null;
+
+        private ParticleSystem _System = null;
+        private Thread _PhysicsThread = null;
 
         public MainWindow()
         {
@@ -36,34 +44,71 @@ namespace pasim.visual
             control.OpenGLInitialized += Control_OpenGLInitialized;
             control.OpenGLDraw += Control_OpenGLDraw;
             control.Resized += Control_Resized;
-            //control.MouseLeftButtonDown += Control_MouseLeftButtonDown;
 
             _RenderTarget.Content = control;
-        }
 
-        private void DrawBodiesVertexArray(OpenGL gl)
-        {
+            _Bodies = ParticleSystem.InitializeBodies(1024 * 4, POSITION_MAX, 0.5f, 1f);
+            //float3[] momentums = ParticleSystem.InitializeMomentums(1024 * 4, 0.1f);
 
+            //_System = new ParticleSystem(_Bodies, momentums);
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
         {
-            if (!_Invalidated)
-                return;
-
-            _Invalidated = false;
-
             OpenGL gl = args.OpenGL;
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
             gl.LoadIdentity();
 
-            if (_UseVertexArray)
+            gl.PushMatrix();
+
+            gl.Translate(0, 0, -300);
+            gl.Rotate(0f, _RotateY, 0f);
+
+            //draw particles
+            gl.Color(0f, 0.65f, 1f);
+            gl.Begin(BeginMode.Points);
+
+            for (uint i = 0; i < _Bodies.Length; i++)
             {
-                DrawBodiesVertexArray(gl);
+                gl.Vertex(_Bodies[i].x, _Bodies[i].y, _Bodies[i].z);
             }
 
+            gl.End();
+
+            //draw boundary
+            //gl.Color(0f, 1f, 0f);
+
+            //gl.Begin(BeginMode.LineLoop);
+            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            //gl.End();
+
+            //gl.Begin(BeginMode.LineLoop);
+            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            //gl.End();
+
+            //gl.Begin(BeginMode.Lines);
+            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(-POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, -POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, -POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(-POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(-POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, POSITION_MAX, -POSITION_MAX);
+            //gl.Vertex(POSITION_MAX, POSITION_MAX, POSITION_MAX);
+            //gl.End();
+
+            gl.PopMatrix();
+
             gl.Flush();
+
+            _RotateY += 0.1f;
         }
 
         private void Control_Resized(object sender, OpenGLEventArgs args)
@@ -74,8 +119,8 @@ namespace pasim.visual
             gl.MatrixMode(OpenGL.GL_PROJECTION);
             gl.LoadIdentity();
 
-            //gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, LENGTH);
-            gl.Ortho(-VIEW_MAX, VIEW_MAX, -VIEW_MAX, VIEW_MAX, 1, -1);
+            gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, VIEW_MAX);
+            //gl.Ortho(-VIEW_MAX, VIEW_MAX, -VIEW_MAX, VIEW_MAX, 1, -1);
 
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
         }
@@ -92,13 +137,6 @@ namespace pasim.visual
             gl.Hint(OpenGL.GL_POINT_SMOOTH_HINT, OpenGL.GL_NICEST);
 
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-
-            if (_VertexBuffer[0] == 0 && gl.IsExtensionFunctionSupported("glGenVertexArrays"))
-            {
-                gl.GenVertexArrays(1000, _VertexBuffer);
-
-                _UseVertexArray = true;
-            }
         }
 
         /*private void Control_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

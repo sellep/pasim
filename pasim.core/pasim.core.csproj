@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeltaMomentumNaiveKernel.cs" />
+    <Compile Include="KernelDescriptor.cs" />
     <Compile Include="Helper\PTXReader.cs" />
     <Compile Include="KernelBase.cs" />
     <Compile Include="ParticleSystem.cs" />

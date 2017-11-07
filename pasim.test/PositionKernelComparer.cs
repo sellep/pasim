@@ -14,19 +14,19 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public class ApplyMomentumKernelComparer : ApplyMomentumBase
+    public class PositionKernelComparer : PositionBase
     {
         private ParticleSystem _System;
 
-        public ApplyMomentumKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
+        public PositionKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
             : base(kernelDirectory, ctx)
         {
             _System = system;
         }
 
-        public IEnumerable<ApplyMomentumComparison> Compare(uint outerIterations, uint innerIterations)
+        public IEnumerable<ComparisonResult> Compare(uint outerIterations, uint innerIterations)
         {
-            List<ApplyMomentumComparison> results = new List<ApplyMomentumComparison>();
+            List<ComparisonResult> results = new List<ComparisonResult>();
             CudaKernel kernel;
             uint o, i, g, b;
             float ms;
@@ -47,7 +47,7 @@ namespace pasim.test
                                 ms += kernel.Run(_System.DevBodies, _System.DevMomentums, _System.DevDeltaMomentums, _System.N, 0.1f);
                             }
 
-                            results.Add(new ApplyMomentumComparison(module, ms / innerIterations, _GridDims[g], _BlockDims[b]));
+                            results.Add(new ComparisonResult(module, ms / innerIterations, _GridDims[g], _BlockDims[b]));
                         }
                     }
                 }

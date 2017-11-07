@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public class ApplyMomentumValidation
+    public class MomentumValidation
     {
 
-        public ApplyMomentumValidation(string module, float4[] bodies)
+        public MomentumValidation(string module, float4[] bodies)
         {
             Module = module;
             Bodies = bodies;

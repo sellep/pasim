@@ -2,6 +2,7 @@
 using pasim.core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,20 +10,20 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public class DeltaMomentumKernelComparer : DeltaMomentumBase
+    public class MomentumKernelComparer : MomentumBase
     {
 
         private ParticleSystem _System;
 
-        public DeltaMomentumKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
+        public MomentumKernelComparer(string kernelDirectory, CudaContext ctx, ParticleSystem system)
             : base(kernelDirectory, ctx)
         {
             _System = system;
         }
 
-        public IEnumerable<ApplyMomentumComparison> Compare(uint outerIterations, uint innerIterations)
+        public IEnumerable<ComparisonResult> Compare(uint outerIterations, uint innerIterations)
         {
-            List<ApplyMomentumComparison> results = new List<ApplyMomentumComparison>();
+            List<ComparisonResult> results = new List<ComparisonResult>();
             CudaKernel kernel;
             uint o, i, g, b;
             float ms;
@@ -35,15 +36,20 @@ namespace pasim.test
                     {
                         for (b = 0; b < _BlockDims.Length; b++)
                         {
+                            if (!KernelDescriptor.IsValidDimensionFor(module, _GridDims[g], _BlockDims[b]))
+                                continue;
+
                             kernel = CreateCudaKernel(module, _Modules[module], _GridDims[g], _BlockDims[b]);
                             ms = 0;
 
+                            Console.WriteLine($"run {Path.GetFileNameWithoutExtension(module)} ({_GridDims[g]}, {_BlockDims[b]})");
+
                             for (i = 0; i < innerIterations; i++)
                             {
-                                ms += kernel.Run(_System.DevBodies, _System.DevMomentums, _System.DevDeltaMomentums, _System.N, 0.1f);
+                                ms += kernel.Run(_System.DevMomentums, _System.DevBodies, _System.N, 0.1f);
                             }
 
-                            results.Add(new ApplyMomentumComparison(module, ms / innerIterations, _GridDims[g], _BlockDims[b]));
+                            results.Add(new ComparisonResult(module, ms / innerIterations, _GridDims[g], _BlockDims[b]));
                         }
                     }
                 }

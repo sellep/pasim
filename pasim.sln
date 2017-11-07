@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pasim.core", "pasim.core\pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pasim.test", "pasim.test\pasim.test.csproj", "{500133A2-F9E4-428A-8D6E-DCE534A37EE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pasim.launcher", "pasim.launcher\pasim.launcher.csproj", "{9E906BCD-8390-4DC2-A364-AF30832B1C99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,14 @@ Global
 		{500133A2-F9E4-428A-8D6E-DCE534A37EE4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{500133A2-F9E4-428A-8D6E-DCE534A37EE4}.Release|x64.ActiveCfg = Release|Any CPU
 		{500133A2-F9E4-428A-8D6E-DCE534A37EE4}.Release|x64.Build.0 = Release|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Debug|x64.Build.0 = Debug|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Release|x64.ActiveCfg = Release|Any CPU
+		{9E906BCD-8390-4DC2-A364-AF30832B1C99}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

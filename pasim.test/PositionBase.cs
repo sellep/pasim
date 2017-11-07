@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 namespace pasim.test
 {
 
-    public abstract class ApplyMomentumBase: TestBase
+    public abstract class PositionBase: TestBase
     {
-        protected override string _KernelPattern => "kernel_apply_momentum_*.ptx";
+        protected override string _KernelPattern => "kernel_position_*.ptx";
 
-        public ApplyMomentumBase(string kernelDirectory, CudaContext ctx)
+        public PositionBase(string kernelDirectory, CudaContext ctx)
             : base (kernelDirectory, ctx)
         {
 

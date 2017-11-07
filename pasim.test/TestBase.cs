@@ -24,9 +24,7 @@ namespace pasim.test
             new dim3(64, 1, 1),
             new dim3(32, 1, 1),
             new dim3(16, 1, 1),
-            new dim3(8, 1, 1),
-            new dim3(4, 1, 1),
-            new dim3(2, 1, 1)
+            new dim3(8, 1, 1)
         };
 
         protected static dim3[] _BlockDims = new[]
@@ -41,12 +39,28 @@ namespace pasim.test
 
         protected abstract string _KernelPattern { get; }
 
+        protected virtual bool OnModuleLoad(string module)
+        {
+            return true;
+        }
+
         public TestBase(string kernelDirectory, CudaContext ctx)
         {
             foreach (string file in Directory.GetFiles(kernelDirectory, _KernelPattern))
             {
-                Console.WriteLine($"found module {Path.GetFileName(file)}");
-                _Modules.Add(file, ctx.LoadModule(file));
+                string moduleName = Path.GetFileName(file);
+
+                Console.Write($"found module {moduleName} ");
+
+                if (OnModuleLoad(moduleName))
+                {
+                    _Modules.Add(file, ctx.LoadModule(file));
+                    Console.WriteLine("[ok]");
+                }
+                else
+                {
+                    Console.WriteLine("[ignored]");
+                }
             }
 
             if (_Modules.Count == 0)
