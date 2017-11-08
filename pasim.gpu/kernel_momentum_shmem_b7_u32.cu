@@ -2,7 +2,7 @@
 
 #define BLOCK_DIM 256
 
-__global__ void delta_momentum_shmem_b7_u32(
+__global__ void momentum_shmem_b7_u32(
 	float3       * const ps,
 	float4 const * const bs,
 	uint           const N,

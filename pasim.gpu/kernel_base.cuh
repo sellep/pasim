@@ -12,15 +12,15 @@ typedef unsigned int uint;
 
 static inline __device__ void delta_momentum(
     float3       * const dp,
-    float4 const * const pi,
-    float4 const * const pj)
+    float4 const * const bi,
+    float4 const * const bj)
 {
     float3 rij;
     float lij;
 
-    rij.x = pj->x - pi->x;
-    rij.y = pj->y - pi->y;
-    rij.z = pj->z - pi->z;
+    rij.x = bj->x - bi->x;
+    rij.y = bj->y - bi->y;
+    rij.z = bj->z - bi->z;
 
     /**
         length(float3 a) = sqrtf(dot(float3 a, float3 a))
@@ -32,7 +32,7 @@ static inline __device__ void delta_momentum(
     */
     if (lij)
     {
-        *dp += rij / (lij * lij * lij) * GRAVITATIONAL_FORCE * pi->w * pj->w;
+        *dp += rij / (lij * lij * lij) * GRAVITATIONAL_FORCE * bi->w * bj->w;
     }
 }
 

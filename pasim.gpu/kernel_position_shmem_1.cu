@@ -2,10 +2,12 @@
 
 extern __shared__ float4 shmem[];
 
-__global__ void apply_momentum_shmem_1(
+#define BLOCK_DIM 512
+
+__global__ void position_shmem_1(
 	float4       * const bs,
 	float3       * const ps,
-	float          const N,
+	uint           const N,
 	float          const dt)
 {
 	float3 momentum;

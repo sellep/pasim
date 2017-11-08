@@ -44,7 +44,7 @@ namespace pasim.test
 
                             for (i = 0; i < innerIterations; i++)
                             {
-                                ms += kernel.Run(_System.DevBodies, _System.DevMomentums, _System.DevDeltaMomentums, _System.N, 0.1f);
+                                ms += kernel.Run(_System.DevBodies, _System.DevMomentums, _System.N, 0.1f);
                             }
 
                             results.Add(new ComparisonResult(module, ms / innerIterations, _GridDims[g], _BlockDims[b]));

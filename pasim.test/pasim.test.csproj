@@ -45,12 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PositionKernelComparer.cs" />
-    <Compile Include="PositionKernelValidator.cs" />
-    <Compile Include="ComparisonResult.cs" />
-    <Compile Include="MomentumValidation.cs" />
-    <Compile Include="MomentumBase.cs" />
     <Compile Include="MomentumKernelComparer.cs" />
+    <Compile Include="PositionKernelComparer.cs" />
+    <Compile Include="ComparisonResult.cs" />
+    <Compile Include="MomentumBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PositionBase.cs" />

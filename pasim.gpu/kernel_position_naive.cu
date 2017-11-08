@@ -1,9 +1,11 @@
 #include "kernel_base.cuh"
 
+#include <stdio.h>
+
 __global__ void position_naive(
     float4       * const bs,
     float3 const * const ps,
-    float          const N,
+    uint           const N,
     float          const dt)
 {
     float4 bi;

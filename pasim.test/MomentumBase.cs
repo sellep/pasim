@@ -17,7 +17,7 @@ namespace pasim.test
     public abstract class MomentumBase : TestBase
     {
 
-        protected override string _KernelPattern => "kernel_momentum_*.ptx";
+        protected override string _KernelPattern => "kernel_momentum_naive*.ptx";
 
         public MomentumBase(string kernelDirectory, CudaContext ctx)
             : base(kernelDirectory, ctx)

@@ -2,10 +2,10 @@
 
 extern __shared__ float shmem[];
 
-__global__ void apply_momentum_shmem_2(
+__global__ void position_shmem_2(
 	float4       * const bs,
 	float3       * const ps,
-	float          const N,
+	uint           const N,
 	float          const dt)
 {
 	float4 *sh_bodies = (float4*)shmem;

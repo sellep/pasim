@@ -16,7 +16,8 @@ namespace pasim.test
 
     public class Program
     {
-        private const uint N = 1024 * 8;
+        private const string KERNEL_DIRECTORY = @"C:\git\pasim\pasim.gpu\x64\Debug\";
+        private const uint N = 1024 * 4;
         private const float POSITION_MAX = 100f;
         private const float MASS_MIN = 0.5f;
         private const float MASS_MAX = 1f;
@@ -25,29 +26,74 @@ namespace pasim.test
 
         public static void Main(string[] args)
         {
-            const string kernel_directory = @"C:\git\pasim\pasim.gpu\x64\Debug\";
+            
 
-            using (CudaContext ctx = new CudaContext(true))
-            {
-                ParticleSystem system = new ParticleSystem(ctx, N, POSITION_MAX, MASS_MIN, MASS_MAX, MOMENTUM_MAX);
+            //float4[] bodies = ParticleSystem.InitializeBodies(N, POSITION_MAX, MASS_MIN, MASS_MAX);
+            //float3[] momentums = ParticleSystem.InitializeMomentums(N, MOMENTUM_MAX);
 
-                MomentumKernelComparer comparer = new MomentumKernelComparer(kernel_directory, ctx, system);
-                IEnumerable<ComparisonResult> results = comparer.Compare(2, 4);
+            //using (ParticleSystem system = new ParticleSystem(bodies, momentums))
+            //{
+            //    //PositionKernelComparer comparer = new PositionKernelComparer(kernel_directory, system.Context, system);
+            //    //IEnumerable<ComparisonResult> results = comparer.Compare(2, 10);
 
-                StringBuilder sb = new StringBuilder();
-                foreach (ComparisonResult result in results)
-                {
-                    sb.AppendLine(result.ToString());
-                }
+            //    MomentumKernelComparer comparer = new MomentumKernelComparer(kernel_directory, system.Context, system);
+            //    IEnumerable<ComparisonResult> results = comparer.Compare(2, 2);
 
-                if (File.Exists("comparer.results.log"))
-                    File.Delete("comparer.results.log");
+            //    StringBuilder sb = new StringBuilder();
+            //    foreach (ComparisonResult result in results)
+            //    {
+            //        sb.AppendLine(result.ToString());
+            //    }
 
-                File.WriteAllText("comparer.results.log", sb.ToString());
-            }
+            //    if (File.Exists("comparer.results.log"))
+            //        File.Delete("comparer.results.log");
+
+            //    File.WriteAllText("comparer.results.log", sb.ToString());
+            //}
+
+            IEnumerable<string> modulePaths = KernelHelper.GetKernels(KERNEL_DIRECTORY, "kernel_momentum_*ptx");
+
+            ValidateMomentumKernels(modulePaths, 1024 * 2, 100, 0.5f, 1f, 1f, 0.1f);
 
             Console.WriteLine("press any key to exit");
             Console.ReadKey();
+        }
+
+        private static void ValidateMomentumKernels(IEnumerable<string> modulePaths, uint n, float posMax, float massMin, float massMax, float momMax, float dt)
+        {
+            float4[] init_bodies = ParticleSystem.InitializeBodies(n, posMax, massMin, massMax);
+            float3[] init_momentums = ParticleSystem.InitializeMomentums(n, momMax);
+            dim3 gridDim, blockDim;
+
+            Dictionary<string, float3[]> momentums = new Dictionary<string, float3[]>();
+
+            foreach (string modulePath in modulePaths)
+            {
+                KernelHelper.GetDimension(modulePath, out gridDim, out blockDim);
+                float3[] momentum = new float3[n];
+
+                using (ParticleSystem system = new ParticleSystem(init_bodies, init_momentums))
+                {
+                    system.SetMomentumKernel(modulePath, gridDim, blockDim);
+
+                    system.TickMomentumOnly(dt);
+
+                    system.SynchronizeMomentums(momentum);
+                }
+
+                momentums.Add(Path.GetFileNameWithoutExtension(modulePath), momentum);
+            }
+
+            for (uint i = 0; i < n; i++)
+            {
+                float3 current = momentums.First().Value[i];
+
+                foreach (string module in momentums.Keys.Skip(1))
+                {
+                    if (momentums[module][i] != current)
+                        throw new Exception($"missmatch at {i}:{Environment.NewLine}\t{momentums.First().Key}: {current}{Environment.NewLine}\t{module}: {momentums[module][i]}");
+                }
+            }
         }
     }
 }

@@ -14,9 +14,13 @@ namespace pasim.core
 
     public class ParticleSystem : IDisposable
     {
+
+
         private CudaContext _Ctx;
         private CudaKernel _MomentumKernel = null;
         private CudaKernel _PositionKernel = null;
+
+        public CudaContext Context => _Ctx;
 
         public uint N { get; }
 
@@ -55,9 +59,9 @@ namespace pasim.core
             return ps;
         }
 
-        public ParticleSystem(float4[] bodies, float3[] momentums)
+        public ParticleSystem(float4[] bodies, float3[] momentums, CudaContext ctx = null)
         {
-            _Ctx = new CudaContext();
+            _Ctx = ctx??new CudaContext();
 
             N = (uint)bodies.Length;
 
@@ -72,15 +76,25 @@ namespace pasim.core
         {
             float ms = 0;
 
-            //ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
+            ms += _MomentumKernel.Run(DevMomentums, DevBodies, N, dt);
             ms += _PositionKernel.Run(DevBodies, DevMomentums, N, dt);
 
             return ms;
         }
 
+        public float TickMomentumOnly(float dt)
+        {
+            return _MomentumKernel.Run(DevBodies, DevMomentums, N, dt);
+        }
+
         public void Synchronize(float4[] bodies)
         {
             _Ctx.CopyToHost(bodies, DevBodies);
+        }
+
+        public void SynchronizeMomentums(float3[] momentums)
+        {
+            _Ctx.CopyToHost(momentums, DevMomentums);
         }
 
         public void SetMomentumKernel(string modulePath, dim3 gridDim, dim3 blockDim)

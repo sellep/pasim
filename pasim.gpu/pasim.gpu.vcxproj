@@ -88,11 +88,15 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="kernel_momentum_naive.cu" />
+    <CudaCompile Include="kernel_momentum_naive_u16.cu" />
+    <CudaCompile Include="kernel_momentum_naive_u2.cu" />
+    <CudaCompile Include="kernel_momentum_naive_u32.cu" />
+    <CudaCompile Include="kernel_momentum_naive_u4.cu" />
+    <CudaCompile Include="kernel_momentum_naive_u8.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u2_u8.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u4_u8.cu" />
     <CudaCompile Include="kernel_position_naive.cu" />
-    <CudaCompile Include="kernel_position_shmem_2.cu" />
-    <CudaCompile Include="kernel_position_shmem_1.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u16.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u32.cu" />
     <CudaCompile Include="kernel_momentum_shmem_b7_u8.cu" />

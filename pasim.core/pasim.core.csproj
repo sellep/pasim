@@ -43,13 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeltaMomentumNaiveKernel.cs" />
     <Compile Include="KernelDescriptor.cs" />
     <Compile Include="Helper\PTXReader.cs" />
-    <Compile Include="KernelBase.cs" />
+    <Compile Include="KernelHelper.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ApplyMomentumNaiveKernel.cs" />
     <Compile Include="Rand.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using ManagedCuda;
 using ManagedCuda.BasicTypes;
 using ManagedCuda.VectorTypes;
+using pasim.core;
 using pasim.core.Helper;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,10 @@ namespace pasim.test
 
         protected CudaKernel CreateCudaKernel(string file, CUmodule module, dim3 gridDim, dim3 blockDim)
         {
-            bool useSharedMemory = Path.GetFileName(file).Contains("shmem");
-
-            if (!useSharedMemory)
+            if (!KernelDescriptor.UsesDynamicSharedMemory(file))
                 return new CudaKernel(PTXReader.ReadEntryPoint(file), module, _Context, blockDim, gridDim);
 
-            if (Path.GetFileName(file) == "kernel_apply_momentum_shmem_2.ptx")
+            if (Path.GetFileName(file) == "kernel_position_shmem_2.ptx")
                 return new CudaKernel(
                     PTXReader.ReadEntryPoint(file),
                     module,
@@ -40,7 +39,7 @@ namespace pasim.test
                     blockDim.x * (uint)(Marshal.SizeOf(typeof(float4)))
                         + blockDim.x * (uint)(Marshal.SizeOf(typeof(float3))));
 
-            if (Path.GetFileName(file) == "kernel_apply_momentum_shmem_1.ptx")
+            if (Path.GetFileName(file) == "kernel_position_shmem_1.ptx")
                 return new CudaKernel(
                     PTXReader.ReadEntryPoint(file),
                     module,
