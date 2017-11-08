@@ -8,66 +8,84 @@
         Title="pasim launcher" Height="350" Width="525">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <GroupBox Header="Physical System"
-                  Grid.Column="0"
-                  Padding="5">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="10" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Text="Kernel directory"/>
+        <TextBox   Grid.Column="1" Grid.Row="0" x:Name="_KernelDirectory" Text="C:\git\pasim\pasim.gpu\x64\Debug\" />
 
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="Particles (N)"/>
-                <TextBox   Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" x:Name="_SystemParticles" Text="1000000" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="1" Text="Particles (N)"/>
+        <TextBox   Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" x:Name="_SystemParticles" Text="1000000" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Gravitational Constant (G)"/>
-                <TextBox   Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" x:Name="_SystemGravitationalConstant" Text="1" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="Gravitational Constant (G)"/>
+        <TextBox   Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" x:Name="_SystemGravitationalConstant" Text="1" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Init Position Max"/>
-                <TextBox   Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" x:Name="_SystemInitPositionMax" Text="500" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="3" Text="Init Position Max"/>
+        <TextBox   Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" x:Name="_SystemInitPositionMax" Text="500" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="Init Mass Min"/>
-                <TextBox   Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2" x:Name="_SystemInitMassMin" Text="0.5" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="4" Text="Init Mass Min"/>
+        <TextBox   Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" x:Name="_SystemInitMassMin" Text="0.5" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="Init Mass Max"/>
-                <TextBox   Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" x:Name="_SystemInitMassMax" Text="1" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="5" Text="Init Mass Max"/>
+        <TextBox   Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2" x:Name="_SystemInitMassMax" Text="1" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="Init Momentum Max"/>
-                <TextBox   Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2" x:Name="_SystemInitMomentumMax" Text="1" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="6" Text="Init Momentum Max"/>
+        <TextBox   Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" x:Name="_SystemInitMomentumMax" Text="1" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="6" Text="Delta Time (dt)"/>
-                <TextBox   Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" x:Name="_SystemDeltaTime" Text="0.01" TextAlignment="Right"/>
+        <TextBlock Grid.Column="0" Grid.Row="7" Text="Delta Time (dt)"/>
+        <TextBox   Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" x:Name="_SystemDeltaTime" Text="0.01" TextAlignment="Right"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="8" Text="Computation Kernel"/>
-                <ComboBox  Grid.Column="1" Grid.Row="8" x:Name="_KernelComputation" />
-                <Button    Grid.Column="2" Grid.Row="8" x:Name="_DetectKernelComputation" Content="Detect"/>
+        <Grid Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Grid.Row="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="9" Text="Update Kernel"/>
-                <ComboBox  Grid.Column="1" Grid.Row="9" x:Name="_KernelUpdate" />
-                <Button    Grid.Column="2" Grid.Row="9" x:Name="_DetectKernelUpdate" Content="Detect"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox Header="Kernels"
-                  Grid.Column="1">
-            
-        </GroupBox>
+            <GroupBox Header="Momentum Kernel"
+                      Grid.Column="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <ComboBox Grid.ColumnSpan="2" x:Name="_MomentumKernels" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Grid Dim" />
+                    <ComboBox Grid.Column="1" Grid.Row="1" x:Name="_MomentumGridDims" />
+
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Block Dim" />
+                    <ComboBox Grid.Column="1" Grid.Row="2" x:Name="_MomentumBlockDims" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Position Kernel"
+                      Grid.Column="1">
+                <ComboBox x:Name="_PositionKernels" />
+            </GroupBox>
+        </Grid>
+
+        <Button Grid.Row="9" x:Name="_Detect" Content="Detect" Click="_Detect_Click" />
     </Grid>
 </Window>

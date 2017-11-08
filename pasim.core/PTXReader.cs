@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace pasim.core.Helper
+namespace pasim.core
 {
 
     public static class PTXReader
     {
 
-        public static string ReadEntryPoint(string file)
+        public static string ReadKernelName(string file)
         {
             /**
                 looking for something like '\t// .globl\t_Z20delta_momentum_naiveP6float3PK6float4jf'

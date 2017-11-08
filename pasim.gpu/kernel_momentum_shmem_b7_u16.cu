@@ -24,7 +24,7 @@ __global__ void momentum_shmem_b7_u16(
 
 			__syncthreads();
 
-#pragma unroll 32
+#pragma unroll 16
 			for (k = 0; k < BLOCK_DIM; k++)
 			{
 				delta_momentum(&dp, &bi, sh_bodies + k);

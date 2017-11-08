@@ -1,7 +1,6 @@
 ﻿using ManagedCuda;
 using ManagedCuda.BasicTypes;
 using ManagedCuda.VectorTypes;
-using pasim.core.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,7 +98,7 @@ namespace pasim.core
 
         public void SetMomentumKernel(string modulePath, dim3 gridDim, dim3 blockDim)
         {
-            string kernel = PTXReader.ReadEntryPoint(modulePath);
+            string kernel = PTXReader.ReadKernelName(modulePath);
             uint? shmem_size = KernelDescriptor.BlockDimension(modulePath);
 
             CUmodule module = _Ctx.LoadModulePTX(modulePath);
@@ -108,7 +107,7 @@ namespace pasim.core
 
         public void SetPositionKernel(string modulePath, dim3 gridDim, dim3 blockDim)
         {
-            string kernel = PTXReader.ReadEntryPoint(modulePath);
+            string kernel = PTXReader.ReadKernelName(modulePath);
 
             CUmodule module = _Ctx.LoadModulePTX(modulePath);
             _PositionKernel = new CudaKernel(kernel, module, _Ctx, blockDim, gridDim);

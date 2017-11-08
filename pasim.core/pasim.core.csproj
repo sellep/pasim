@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KernelDescriptor.cs" />
-    <Compile Include="Helper\PTXReader.cs" />
+    <Compile Include="PTXReader.cs" />
     <Compile Include="KernelHelper.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

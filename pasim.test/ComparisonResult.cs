@@ -2,6 +2,7 @@
 using ManagedCuda.VectorTypes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace pasim.test
 
         public override string ToString()
         {
-            return $"{Module}: {MS} ({GridDim}, {BlockDim})";
+            return $"{Path.GetFileNameWithoutExtension(Module)} {GridDim}, {BlockDim}: {MS}";
         }
     }
 }
