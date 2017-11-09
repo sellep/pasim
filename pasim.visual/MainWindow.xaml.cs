@@ -20,22 +20,23 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.IO;
 
 namespace pasim.visual
 {
 
     public partial class MainWindow : Window
     {
-        public const float VIEW_MAX = 400;
+        public const float VIEW_MAX = 600;
 
         private float _RotateY = 0;
 
-        private float4[] _Bodies = null;
+        private List<float4[]> _Bodies = new List<float4[]>();
 
         private readonly object _Sync = new object();
         private volatile bool _Terminate = false;
-        private volatile bool _Invalidated = true;
         private uint _FrameCount = 0;
+        private uint _RenderedFrameCount = 0;
         private Thread _PhysicsThread = null;
 
         public MainWindow(PasimSetup setup)
@@ -50,13 +51,14 @@ namespace pasim.visual
 
             _RenderTarget.Content = control;
 
-            _Bodies = ParticleSystem.InitializeBodies(setup.N * setup.NMultiplier, setup.InitPositionMax, setup.InitMassMin, setup.InitMassMax);
+            float4[] initalBodies = ParticleSystem.InitializeBodies(setup.N * setup.NMultiplier, setup.InitPositionMax, setup.InitMassMin, setup.InitMassMax);
+            _Bodies.Add(initalBodies);
 
             _PhysicsThread = new Thread(() =>
             {
                 float3[] initialMomentums = ParticleSystem.InitializeMomentums(setup.N * setup.NMultiplier, setup.InitMomentumMax);
 
-                ParticleSystem system = new ParticleSystem(_Bodies, initialMomentums);
+                ParticleSystem system = new ParticleSystem(initalBodies, initialMomentums);
 
                 system.SetMomentumKernel(setup.MomentumKernelPath, setup.MomentumGrid, setup.MomentumBlock);
                 system.SetPositionKernel(setup.PositionKernelPath, setup.PositionGrid, setup.MomentumBlock);
@@ -64,13 +66,14 @@ namespace pasim.visual
                 while (!_Terminate)
                 {
                     float ms = system.Tick(setup.DT);
+                    float4[] bodies = new float4[setup.N * setup.NMultiplier];
+                    system.Synchronize(bodies);
 
                     lock (_Sync)
                     {
-                        system.Synchronize(_Bodies);
+                        _Bodies.Add(bodies);
                     }
 
-                    _Invalidated = true;
                     _FrameCount++;
 
                     StringBuilder sb = new StringBuilder();
@@ -88,10 +91,16 @@ namespace pasim.visual
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
         {
-            if (!_Invalidated)
-                return;
+            float4[] bodies = null;
 
-            _Invalidated = false;
+            lock (_Sync)
+            {
+                if (_Bodies.Count == 0)
+                    return;
+
+                bodies = _Bodies.First();
+                _Bodies.RemoveAt(0);
+            }
 
             OpenGL gl = args.OpenGL;
 
@@ -104,19 +113,16 @@ namespace pasim.visual
             gl.Rotate(0f, _RotateY, 0f);
 
             //draw particles
-            lock (_Sync)
+            gl.PointSize(1f);
+            gl.Color(0f, 0.65f, 1f);
+            gl.Begin(BeginMode.Points);
+
+            for (uint i = 0; i < bodies.Length; i++)
             {
-                gl.PointSize(1f);
-                gl.Color(0f, 0.65f, 1f);
-                gl.Begin(BeginMode.Points);
-
-                for (uint i = 0; i < _Bodies.Length; i++)
-                {
-                    gl.Vertex(_Bodies[i].x, _Bodies[i].y, _Bodies[i].z);
-                }
-
-                gl.End();
+                gl.Vertex(bodies[i].x, bodies[i].y, bodies[i].z);
             }
+
+            gl.End();
 
             //draw boundary
             //gl.Color(0f, 1f, 0f);
@@ -150,8 +156,25 @@ namespace pasim.visual
 
             gl.Flush();
 
-            _RotateY += 0.01f;
+            int w = gl.RenderContextProvider.Width;
+            int h = gl.RenderContextProvider.Height;
+
+            byte[] pixels = new byte[w * h * 4];
+
+            gl.ReadPixels(0, 0, w, h, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE, pixels);
+
+
+            BitmapSource source = BitmapSource.Create(w, h, 96, 96, PixelFormats.Bgra32, null, pixels, 4 * w);
+            using (Stream fs = File.OpenWrite($"bitmaps/frame_{_RenderedFrameCount++}.png"))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(source));
+                encoder.Save(fs);
+            }
+
+            _RotateY += 0.1f;
         }
+
 
         private void Control_Resized(object sender, OpenGLEventArgs args)
         {
@@ -161,8 +184,7 @@ namespace pasim.visual
             gl.MatrixMode(OpenGL.GL_PROJECTION);
             gl.LoadIdentity();
 
-            gl.Perspective(90.0f, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.1, 3 * VIEW_MAX);
-            //gl.Ortho(-VIEW_MAX, VIEW_MAX, -VIEW_MAX, VIEW_MAX, 1, -1);
+            gl.Perspective(90, (float)gl.RenderContextProvider.Width / gl.RenderContextProvider.Height, 0.001, 100 * VIEW_MAX);
 
             gl.MatrixMode(OpenGL.GL_MODELVIEW);
         }
