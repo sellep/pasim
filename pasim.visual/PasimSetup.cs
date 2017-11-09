@@ -11,6 +11,21 @@ namespace pasim.visual
 
     public class PasimSetup
     {
+        private const string n_arg = "n=";
+        private const string multiplier_arg = "nm=";
+        private const string momentum_kernel_arg = "mom_k=";
+        private const string momentum_grid_arg = "mom_g=";
+        private const string momentum_block_arg = "mom_b=";
+        private const string position_kernel_arg = "pos_k=";
+        private const string position_grid_arg = "pos_g=";
+        private const string position_block_arg = "pos_b=";
+        private const string g_arg = "g=";
+        private const string d_arg = "d=";
+        private const string pos_max_arg = "pos_max=";
+        private const string mass_min_arg = "mass_min=";
+        private const string mass_max_arg = "mass_max=";
+        private const string mom_max_arg = "mom_max=";
+        private const string dt_arg = "dt=";
 
         public string KernelDirectory { get; set; }
 
@@ -44,22 +59,6 @@ namespace pasim.visual
 
         public static PasimSetup Parse(string[] args)
         {
-            const string n_arg = "n=";
-            const string multiplier_arg = "nm=";
-            const string momentum_kernel_arg = "mom_k=";
-            const string momentum_grid_arg = "mom_g=";
-            const string momentum_block_arg = "mom_b=";
-            const string position_kernel_arg = "pos_k=";
-            const string position_grid_arg = "pos_g=";
-            const string position_block_arg = "pos_b=";
-            const string g_arg = "g=";
-            const string d_arg = "d=";
-            const string pos_max_arg = "pos_max=";
-            const string mass_min_arg = "mass_min=";
-            const string mass_max_arg = "mass_max=";
-            const string mom_max_arg = "mom_max=";
-            const string dt_arg = "dt=";
-
             PasimSetup setup = new PasimSetup();
 
             foreach (string arg in args)
@@ -127,6 +126,26 @@ namespace pasim.visual
             }
 
             return setup;
+        }
+
+        public string CreateCLArgs()
+        {
+            return
+                $"\"{d_arg}{KernelDirectory}\" " +
+                $"{n_arg}{N} " +
+                $"{multiplier_arg}{NMultiplier} " +
+                $"{g_arg}{G} " +
+                $"{pos_max_arg}{InitPositionMax} " +
+                $"{mass_min_arg}{InitMassMin} " +
+                $"{mass_max_arg}{InitMassMax} " +
+                $"{mom_max_arg}{InitMomentumMax} " +
+                $"{dt_arg}{DT} " +
+                $"\"{momentum_kernel_arg}{MomentumKernel}\" " +
+                $"\"{momentum_grid_arg}{MomentumGrid}\" " +
+                $"\"{momentum_block_arg}{MomentumBlock}\" " +
+                $"\"{position_kernel_arg}{PositionKernel}\" " +
+                $"\"{position_grid_arg}{PositionGrid}\" " +
+                $"\"{position_block_arg}{PositionBlock}\"";
         }
     }
 }

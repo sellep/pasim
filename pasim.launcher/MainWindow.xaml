@@ -124,6 +124,6 @@
             </GroupBox>
         </Grid>
 
-        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="9" x:Name="_Launch" Content="Launch" Click="_Launch_Click" />
+        <Button Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="9" x:Name="_Launch" Content="Launch" Click="_Launch_Click" />
     </Grid>
 </Window>
