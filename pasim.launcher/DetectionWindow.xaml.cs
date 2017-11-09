@@ -60,7 +60,10 @@ namespace pasim.launcher
 
             p.OutputDataReceived += (s, e) =>
             {
-                LastLine = e.Data;
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    LastLine = e.Data;
+                }
 
                 Dispatcher.BeginInvoke(new Action(() =>
                 {

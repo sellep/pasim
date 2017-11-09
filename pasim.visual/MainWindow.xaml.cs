@@ -40,7 +40,7 @@ namespace pasim.visual
         private volatile bool _Terminate = false;
         private Thread _PhysicsThread = null;
 
-        public MainWindow()
+        public MainWindow(PasimSetup setup)
         {
             InitializeComponent();
 

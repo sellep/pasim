@@ -87,7 +87,7 @@ namespace pasim.test
                 }
                 else
                 {
-                    results = Enumerable.Empty<ComparisonResult>();
+                    results = ComparePositionKernels(setup, modulePaths, system);
                 }
             }
 
@@ -109,6 +109,43 @@ namespace pasim.test
             ComparisonResult best = results.First();
 
             Console.WriteLine(best.ToString());
+        }
+
+        private static IEnumerable<ComparisonResult> ComparePositionKernels(TestSetup setup, IEnumerable<string> modulePaths, ParticleSystem system)
+        {
+            List<ComparisonResult> results = new List<ComparisonResult>();
+            CudaKernel kernel;
+            uint o, i, g, b;
+            float ms;
+
+            for (o = 0; o < setup.OuterIterations; o++)
+            {
+                foreach (string module in modulePaths)
+                {
+                    for (g = 0; g < KernelHelper.GridDims.Length; g++)
+                    {
+                        for (b = 0; b < KernelHelper.BlockDims.Length; b++)
+                        {
+                            if (!KernelDescriptor.IsValidDimensionFor(module, KernelHelper.GridDims[g], KernelHelper.BlockDims[b]))
+                                continue;
+
+                            Console.WriteLine($"run {Path.GetFileNameWithoutExtension(module)} {KernelHelper.GridDims[g]} {KernelHelper.BlockDims[b]}");
+
+                            kernel = KernelHelper.CreateCudaKernel(system.Context, module, KernelHelper.GridDims[g], KernelHelper.BlockDims[b]);
+                            ms = 0;
+
+                            for (i = 0; i < setup.InnerIterations; i++)
+                            {
+                                ms += kernel.Run(system.DevBodies, system.DevMomentums, system.N, 0.1f);
+                            }
+
+                            results.Add(new ComparisonResult(module, ms / setup.InnerIterations, KernelHelper.GridDims[g], KernelHelper.BlockDims[b]));
+                        }
+                    }
+                }
+            }
+
+            return results.OrderBy(r => r.MS);
         }
 
         private static IEnumerable<ComparisonResult> CompareMomentumKernels(TestSetup setup, IEnumerable<string> modulePaths, ParticleSystem system)

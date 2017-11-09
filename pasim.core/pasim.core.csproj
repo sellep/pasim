@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dim3ext.cs" />
     <Compile Include="KernelDescriptor.cs" />
     <Compile Include="PTXReader.cs" />
     <Compile Include="KernelHelper.cs" />

@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedCuda, Version=8.0.22.0, Culture=neutral, PublicKeyToken=242d898828717aa0, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedCuda-80.8.0.22\lib\net46\ManagedCuda.dll</HintPath>
@@ -80,6 +83,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PasimSetup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

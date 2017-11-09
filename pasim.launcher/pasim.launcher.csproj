@@ -35,6 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ManagedCuda, Version=8.0.22.0, Culture=neutral, PublicKeyToken=242d898828717aa0" />
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -67,6 +70,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ConfigurationHelper.cs" />
     <Compile Include="DetectionWindow.xaml.cs">
       <DependentUpon>DetectionWindow.xaml</DependentUpon>
     </Compile>
@@ -93,6 +97,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -109,6 +114,10 @@
     <ProjectReference Include="..\pasim.test\pasim.test.csproj">
       <Project>{500133a2-f9e4-428a-8d6e-dce534a37ee4}</Project>
       <Name>pasim.test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\pasim.visual\pasim.visual.csproj">
+      <Project>{8D746397-BB4B-4474-A241-3C71B9595A42}</Project>
+      <Name>pasim.visual</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

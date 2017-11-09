@@ -13,5 +13,20 @@ namespace pasim.visual
     /// </summary>
     public partial class App : Application
     {
+
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (e.Args.Length == 0)
+            {
+                MessageBox.Show("Use pasim.launcher.exe to setup simulation conditions", "pasim", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            PasimSetup setup = PasimSetup.Parse(e.Args);
+
+            MainWindow win = new MainWindow(setup);
+            win.Show();
+        }
     }
 }
