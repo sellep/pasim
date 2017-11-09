@@ -20,7 +20,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="10" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -62,7 +62,7 @@
         <TextBox   Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" x:Name="_SystemInitMomentumMax" Text="1" TextAlignment="Right"/>
 
         <TextBlock Grid.Column="0" Grid.Row="7" Text="Delta Time (dt)"/>
-        <TextBox   Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" x:Name="_SystemDeltaTime" Text="0.01" TextAlignment="Right"/>
+        <TextBox   Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" x:Name="_SystemDeltaTime" Text="0.01" TextAlignment="Right" />
 
         <Grid Grid.Column="0"
               Grid.ColumnSpan="3"

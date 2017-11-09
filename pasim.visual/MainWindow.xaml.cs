@@ -34,6 +34,8 @@ namespace pasim.visual
 
         private readonly object _Sync = new object();
         private volatile bool _Terminate = false;
+        private volatile bool _Invalidated = true;
+        private uint _FrameCount = 0;
         private Thread _PhysicsThread = null;
 
         public MainWindow(PasimSetup setup)
@@ -68,12 +70,14 @@ namespace pasim.visual
                         system.Synchronize(_Bodies);
                     }
 
-                    Dispatcher.BeginInvoke(new Action(() => { _InfoTarget.Text = $"Physical ms: {ms}"; }));
+                    _Invalidated = true;
+                    _FrameCount++;
 
-                    if (ms < 12)
-                    {
-                        Thread.Sleep(12 - (int)ms);
-                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine($"Render time: {ms}");
+                    sb.AppendLine($"Frame count: {_FrameCount}");
+
+                    Dispatcher.BeginInvoke(new Action(() => _InfoTarget.Text = sb.ToString()));
                 }
 
                 system.Dispose();
@@ -84,6 +88,11 @@ namespace pasim.visual
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)
         {
+            if (!_Invalidated)
+                return;
+
+            _Invalidated = false;
+
             OpenGL gl = args.OpenGL;
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
