@@ -27,10 +27,6 @@ namespace pasim.visual
     public partial class MainWindow : Window
     {
         public const float VIEW_MAX = 400;
-        public const float POSITION_MAX = 200;
-        public const float MOMENTUM_MAX = 1;
-        public const uint N = 1024 * 4;
-        public const float DT = 0.5f;
 
         private float _RotateY = 0;
 
@@ -44,47 +40,46 @@ namespace pasim.visual
         {
             InitializeComponent();
 
-            //OpenGLControl control = new OpenGLControl();
+            OpenGLControl control = new OpenGLControl();
 
-            //control.OpenGLInitialized += Control_OpenGLInitialized;
-            //control.OpenGLDraw += Control_OpenGLDraw;
-            //control.Resized += Control_Resized;
+            control.OpenGLInitialized += Control_OpenGLInitialized;
+            control.OpenGLDraw += Control_OpenGLDraw;
+            control.Resized += Control_Resized;
 
-            //_RenderTarget.Content = control;
+            _RenderTarget.Content = control;
 
-            //_Bodies = ParticleSystem.InitializeBodies(N, POSITION_MAX, 0.5f, 1f);
+            _Bodies = ParticleSystem.InitializeBodies(setup.N * setup.NMultiplier, setup.InitPositionMax, setup.InitMassMin, setup.InitMassMax);
 
-            //_PhysicsThread = new Thread(() =>
-            //{
-            //    float3[] initialMomentums = ParticleSystem.InitializeMomentums(N, MOMENTUM_MAX);
+            _PhysicsThread = new Thread(() =>
+            {
+                float3[] initialMomentums = ParticleSystem.InitializeMomentums(setup.N * setup.NMultiplier, setup.InitMomentumMax);
 
-            //    ParticleSystem system = new ParticleSystem(_Bodies, initialMomentums);
+                ParticleSystem system = new ParticleSystem(_Bodies, initialMomentums);
 
-            //    system.SetMomentumKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_momentum_shmem_b7_u8.ptx", new dim3(16, 1, 1), new dim3(256, 1, 1));
-            //    //system.SetMomentumKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_momentum_naive_u16.ptx", new dim3(256, 1, 1), new dim3(32, 1, 1));
-            //    system.SetPositionKernel(@"C:\git\pasim\pasim.gpu\x64\Debug\kernel_position_naive.ptx", new dim3(32, 1, 1), new dim3(256, 1, 1));
+                system.SetMomentumKernel(setup.MomentumKernelPath, setup.MomentumGrid, setup.MomentumBlock);
+                system.SetPositionKernel(setup.PositionKernelPath, setup.PositionGrid, setup.MomentumBlock);
 
-            //    while (!_Terminate)
-            //    {
-            //        float ms = system.Tick(DT);
+                while (!_Terminate)
+                {
+                    float ms = system.Tick(setup.DT);
 
-            //        lock (_Sync)
-            //        {
-            //            system.Synchronize(_Bodies);
-            //        }
+                    lock (_Sync)
+                    {
+                        system.Synchronize(_Bodies);
+                    }
 
-            //        Dispatcher.BeginInvoke(new Action(() => { _InfoTarget.Text = $"Physical ms: {ms}";  }));
+                    Dispatcher.BeginInvoke(new Action(() => { _InfoTarget.Text = $"Physical ms: {ms}"; }));
 
-            //        if (ms < 12)
-            //        {
-            //            Thread.Sleep(12 - (int)ms);
-            //        }
-            //    }
+                    if (ms < 12)
+                    {
+                        Thread.Sleep(12 - (int)ms);
+                    }
+                }
 
-            //    system.Dispose();
-            //});
+                system.Dispose();
+            });
 
-            //_PhysicsThread.Start();
+            _PhysicsThread.Start();
         }
 
         private void Control_OpenGLDraw(object sender, OpenGLEventArgs args)

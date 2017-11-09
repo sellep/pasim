@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace pasim.launcher
+namespace pasim.visual
 {
 
     public static class ConfigurationHelper
@@ -77,9 +77,9 @@ namespace pasim.launcher
             return setup;
         }
 
-        public static void Save(PasimSetup setup)
+        public static void Save(PasimSetup setup, string path = null)
         {
-            string cfgPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pasim.cfg");
+            string cfgPath = path??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pasim.cfg");
             string cfg = JsonConvert.SerializeObject(setup, Formatting.Indented);
 
             using (Stream s = File.OpenWrite(cfgPath))

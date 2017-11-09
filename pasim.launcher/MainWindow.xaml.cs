@@ -114,7 +114,11 @@ namespace pasim.launcher
             ConfigurationHelper.Save(_Setup);
 
             string args = _Setup.CreateCLArgs();
-            Process.Start("pasim.visual.exe", args);
+
+            ProcessStartInfo psi = new ProcessStartInfo("pasim.visual.exe", args);
+            psi.UseShellExecute = false;
+
+            Process.Start(psi);
 
             Close();
         }
@@ -123,7 +127,7 @@ namespace pasim.launcher
         {
             _KernelDirectory.Text = _Setup.KernelDirectory;
             _SystemParticles.Text = _Setup.N.ToString();
-            _ParticleMultiplier.SelectedItem = _Setup.NMultiplier.ToString();
+            _ParticleMultiplier.SelectedItem = _ParticleMultiplier.Items.Cast<ComboBoxItem>().First(c => c.Content.Equals(_Setup.NMultiplier.ToString()));
             _SystemGravitationalConstant.Text = _Setup.G.ToString();
             _SystemInitPositionMax.Text = _Setup.InitPositionMax.ToString();
             _SystemInitMassMin.Text = _Setup.InitMassMin.ToString();

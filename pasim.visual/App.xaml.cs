@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,7 +24,14 @@ namespace pasim.visual
                 return;
             }
 
+            for (int i = 0; i < e.Args.Length; i++)
+            {
+                File.AppendAllText("pasim.visual.log", e.Args[i] + Environment.NewLine);
+            }
+
             PasimSetup setup = PasimSetup.Parse(e.Args);
+
+            ConfigurationHelper.Save(setup, Path.GetTempFileName());
 
             MainWindow win = new MainWindow(setup);
             win.Show();

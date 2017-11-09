@@ -1,7 +1,9 @@
 ﻿using ManagedCuda.VectorTypes;
+using Newtonsoft.Json;
 using pasim.core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,6 +58,12 @@ namespace pasim.visual
         public float InitMomentumMax { get; set; }
 
         public float DT { get; set; }
+
+        [JsonIgnore]
+        public string MomentumKernelPath => Path.Combine(KernelDirectory, MomentumKernel + ".ptx");
+
+        [JsonIgnore]
+        public string PositionKernelPath => Path.Combine(KernelDirectory, PositionKernel + ".ptx");
 
         public static PasimSetup Parse(string[] args)
         {
@@ -131,7 +139,7 @@ namespace pasim.visual
         public string CreateCLArgs()
         {
             return
-                $"\"{d_arg}{KernelDirectory}\" " +
+                $"{d_arg}{KernelDirectory} " +
                 $"{n_arg}{N} " +
                 $"{multiplier_arg}{NMultiplier} " +
                 $"{g_arg}{G} " +
