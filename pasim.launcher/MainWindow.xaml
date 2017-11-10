@@ -22,6 +22,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -64,9 +65,27 @@
         <TextBlock Grid.Column="0" Grid.Row="7" Text="Delta Time (dt)"/>
         <TextBox   Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" x:Name="_SystemDeltaTime" Text="0.01" TextAlignment="Right" />
 
+        <GroupBox Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="3" Header="Additional settings">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Visual Width"/>
+                <TextBox   Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" x:Name="_VisualWidth" Text="800" TextAlignment="Right" />
+            </Grid>
+        </GroupBox>
+
         <Grid Grid.Column="0"
               Grid.ColumnSpan="3"
-              Grid.Row="8">
+              Grid.Row="9">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -124,6 +143,6 @@
             </GroupBox>
         </Grid>
 
-        <Button Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="9" x:Name="_Launch" Content="Launch" Click="_Launch_Click" />
+        <Button Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="10" x:Name="_Launch" Content="Launch" Click="_Launch_Click" />
     </Grid>
 </Window>
